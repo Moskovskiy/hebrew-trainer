@@ -1,3 +1,5 @@
+import generateSentences from './generator';
+
 const words = [
   'yo', 'tú', 'él', 'ella', 'nosotros', 'vosotros', 'ir', 'querer', 'comer', 'beber',
   'trabajar', 'niño', 'perro', 'gato', 'casa', 'escuela', 'apartamento', 'mesa', 'silla',
@@ -13,15 +15,10 @@ const words = [
   'bolígrafo', 'papel', 'computadora', 'teléfono'
 ];
 
-function randomSentence(): string {
-  const arr: string[] = [];
-  for (let i = 0; i < 10; i++) {
-    const word = words[Math.floor(Math.random() * words.length)];
-    arr.push(word);
-  }
-  return arr.join(' ');
-}
+const prepositions = [
+  'en', 'desde', 'con', 'sin', 'debajo', 'encima', 'cerca', 'entre', 'alrededor', 'a través'
+];
 
-const sentences: string[] = Array.from({ length: 1000 }, randomSentence);
+const sentences = generateSentences(words, ' ', prepositions);
 
 export default sentences;

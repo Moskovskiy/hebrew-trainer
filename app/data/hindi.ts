@@ -1,3 +1,5 @@
+import generateSentences from './generator';
+
 const words = [
   'मैं', 'तुम', 'वह', 'हम', 'आप', 'वे', 'जाना', 'चाहना', 'खाना', 'पीना',
   'काम', 'बच्चा', 'कुत्ता', 'बिल्ली', 'घर', 'स्कूल', 'अपार्टमेंट', 'मेज़', 'कुर्सी',
@@ -8,15 +10,10 @@ const words = [
   'काफी', 'चाय', 'दूध', 'पानी'
 ];
 
-function randomSentence(): string {
-  const arr: string[] = [];
-  for (let i = 0; i < 10; i++) {
-    const word = words[Math.floor(Math.random() * words.length)];
-    arr.push(word);
-  }
-  return arr.join(' ');
-}
+const prepositions = [
+  'में', 'से', 'के साथ', 'के बिना', 'के नीचे', 'के ऊपर', 'पास', 'के बीच', 'चारों ओर', 'के माध्यम से'
+];
 
-const sentences: string[] = Array.from({ length: 1000 }, randomSentence);
+const sentences = generateSentences(words, ' ', prepositions);
 
 export default sentences;

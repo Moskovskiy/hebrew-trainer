@@ -1,3 +1,5 @@
+import generateSentences from './generator';
+
 const words = [
   '我', '你', '他', '她', '我们', '你们', '去', '想', '吃', '喝',
   '工作', '孩子', '狗', '猫', '房子', '学校', '公寓', '桌子', '椅子',
@@ -13,15 +15,10 @@ const words = [
   '笔', '纸', '电脑', '电话'
 ];
 
-function randomSentence(): string {
-  const arr: string[] = [];
-  for (let i = 0; i < 10; i++) {
-    const word = words[Math.floor(Math.random() * words.length)];
-    arr.push(word);
-  }
-  return arr.join('');
-}
+const prepositions = [
+  '在', '从', '和', '没有', '下', '上', '附近', '之间', '周围', '通过'
+];
 
-const sentences: string[] = Array.from({ length: 1000 }, randomSentence);
+const sentences = generateSentences(words, '', prepositions);
 
 export default sentences;

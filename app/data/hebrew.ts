@@ -1,3 +1,5 @@
+import generateSentences from './generator';
+
 const words = [
   'אני', 'אתה', 'הוא', 'היא', 'אנחנו', 'אתם', 'הולך', 'רוצה', 'לאכול', 'לשתות',
   'עובד', 'ילד', 'ילדה', 'כלב', 'חתול', 'בית', 'ספר', 'דירה', 'שולחן', 'כיסא',
@@ -10,18 +12,13 @@ const words = [
   'בוכים', 'מקשיבים', 'זוכרים', 'שוכחים', 'מציירים', 'בונים', 'חולמים',
   'חושבים', 'כדור', 'חתונה', 'לימודים', 'חופשה', 'איש', 'אישה', 'ילדים',
   'עבודה', 'מתנה', 'סיפור', 'משחק', 'תמונה', 'חנות', 'גן', 'גינה', 'שטח',
-  'פרח', 'עץ', 'מחברת', 'עפרון', 'עט', 'נייר', 'מחשב', 'טלפון',
+  'פרח', 'עץ', 'מחברת', 'עפרון', 'עט', 'נייר', 'מחשב', 'טלפון'
 ];
 
-function randomSentence(): string {
-  const arr: string[] = [];
-  for (let i = 0; i < 10; i++) {
-    const word = words[Math.floor(Math.random() * words.length)];
-    arr.push(word);
-  }
-  return arr.join(' ');
-}
+const prepositions = [
+  'ב', 'מ', 'עם', 'בלי', 'מתחת', 'מעל', 'קרוב', 'בין', 'סביב', 'דרך'
+];
 
-const sentences: string[] = Array.from({ length: 1000 }, randomSentence);
+const sentences = generateSentences(words, ' ', prepositions);
 
 export default sentences;
