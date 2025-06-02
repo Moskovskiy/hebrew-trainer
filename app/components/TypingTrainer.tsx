@@ -1,20 +1,22 @@
 'use client';
 import { useEffect, useState } from 'react';
-import sentences from '../data/sentences';
+import dictionaries, { Language } from '../data/dictionaries';
 import confetti from 'canvas-confetti';
 
 export default function TypingTrainer() {
+  const [language, setLanguage] = useState<Language>('hebrew');
   const [index, setIndex] = useState(0);
   const [input, setInput] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
   const [speed, setSpeed] = useState<number | null>(null);
 
+  const sentences = dictionaries[language];
   const sentence = sentences[index % sentences.length];
 
   useEffect(() => {
     setInput('');
     setStartTime(null);
-  }, [index]);
+  }, [index, language]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (startTime === null && e.target.value.length === 1) {
@@ -34,7 +36,12 @@ export default function TypingTrainer() {
       const next = (index + 1) % sentences.length;
       setTimeout(() => setIndex(next), 500);
     }
-  }, [input, sentence, startTime, index]);
+  }, [input, sentence, startTime, index, sentences.length]);
+
+  useEffect(() => {
+    setIndex(0);
+    setSpeed(null);
+  }, [language]);
 
   const getCharClass = (char: string, idx: number) => {
     if (idx < input.length) {
@@ -48,14 +55,32 @@ export default function TypingTrainer() {
     return 'text-gray-700';
   };
 
+  const isRTL = language === 'hebrew' || language === 'arabic';
+
   return (
     <div className="space-y-4">
+      <div>
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value as Language)}
+          className="p-2 border rounded"
+        >
+          <option value="hebrew">Hebrew</option>
+          <option value="german">German</option>
+          <option value="chinese">Chinese</option>
+          <option value="spanish">Spanish</option>
+          <option value="arabic">Arabic</option>
+        </select>
+      </div>
       {speed && (
         <div className="text-center text-xl font-bold">
           Speed: {speed.toFixed(2)} chars/sec
         </div>
       )}
-      <div dir="rtl" className="text-2xl bg-white p-4 rounded shadow min-h-[4rem] font-medium tracking-wide">
+      <div
+        dir={isRTL ? 'rtl' : 'ltr'}
+        className="text-2xl bg-white p-4 rounded shadow min-h-[4rem] font-medium tracking-wide"
+      >
         {sentence.split('').map((char, idx) => (
           <span key={idx} className={getCharClass(char, idx)}>
             {char}
@@ -64,7 +89,7 @@ export default function TypingTrainer() {
       </div>
       <input
         type="text"
-        dir="rtl"
+        dir={isRTL ? 'rtl' : 'ltr'}
         autoFocus
         value={input}
         onChange={handleChange}
