@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gradient-to-br from-indigo-100 via-white to-emerald-100 text-gray-800 flex justify-center items-center min-h-screen;
+  @apply bg-gradient-to-br from-indigo-100 via-white to-emerald-100 text-gray-800 flex justify-center items-start lg:items-center min-h-screen;
 }

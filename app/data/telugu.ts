@@ -1,3 +1,5 @@
+import generateSentences from './generator';
+
 const words = [
   'నేను', 'నీవు', 'అతను', 'ఆమె', 'మనం', 'మీరు', 'వారు', 'వెల్లడం', 'కావడం', 'తినటం',
   'తాగటం', 'పని', 'పిల్ల', 'కుక్క', 'పిల్లి', 'ఇల్లు', 'పాఠశాల', 'అపార్ట్‌మెంట్', 'మెజ', 'కుర్చీ',
@@ -6,15 +8,10 @@ const words = [
   'ఆకాశం', 'భూమి', 'పండుగ', 'సంతోషం', 'స్నేహితులు', 'కుటుంబం', 'ప్రయాణం', 'సంగీతం'
 ];
 
-function randomSentence(): string {
-  const arr: string[] = [];
-  for (let i = 0; i < 10; i++) {
-    const word = words[Math.floor(Math.random() * words.length)];
-    arr.push(word);
-  }
-  return arr.join(' ');
-}
+const prepositions = [
+  'లో', 'నుంచి', 'తో', 'లేకుండా', 'కింద', 'పై', 'దగ్గర', 'మధ్యలో', 'చుట్టూ', 'ద్వారా'
+];
 
-const sentences: string[] = Array.from({ length: 1000 }, randomSentence);
+const sentences = generateSentences(words, ' ', prepositions);
 
 export default sentences;
