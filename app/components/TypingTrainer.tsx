@@ -4,7 +4,7 @@ import dictionaries, { Language } from '../data/dictionaries';
 import confetti from 'canvas-confetti';
 
 export default function TypingTrainer() {
-  const [language, setLanguage] = useState<Language>('hebrew');
+  const [language, setLanguage] = useState<Language>('english');
   const [index, setIndex] = useState(0);
   const [input, setInput] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -73,11 +73,16 @@ export default function TypingTrainer() {
           onChange={(e) => setLanguage(e.target.value as Language)}
           className="p-2 border rounded"
         >
+          <option value="english">English</option>
           <option value="hebrew">Hebrew</option>
           <option value="german">German</option>
           <option value="chinese">Chinese</option>
           <option value="spanish">Spanish</option>
           <option value="arabic">Arabic</option>
+          <option value="hindi">Hindi</option>
+          <option value="telugu">Telugu</option>
+          <option value="russian">Russian</option>
+          <option value="japanese">Japanese</option>
         </select>
       </div>
       {speed && (
