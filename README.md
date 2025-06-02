@@ -1,6 +1,6 @@
-# Hebrew Typing Trainer
+# Multilingual Typing Trainer
 
-This is a small single page application for practicing blind keyboard typing in Hebrew. It is built with **Next.js**, **React** and **Tailwind CSS** and can be deployed easily to Vercel. The interface is in English while the sentences are in Hebrew.
+This is a small single page application for practicing blind keyboard typing. Originally focused on Hebrew, it now includes dictionaries for German, Chinese, Spanish and Arabic as well. The interface is in English and the sentences are shown in the selected language. It is built with **Next.js**, **React** and **Tailwind CSS** and can be deployed easily to Vercel.
 
 ## Development
 
@@ -13,9 +13,9 @@ The app will start in development mode on `http://localhost:3000`.
 
 ## Features
 
-- Displays over a thousand random Hebrew sentences (around ten words each)
+- Displays over a thousand random sentences (around ten words each) for each supported language
 - Highlights correct letters in green, mistakes in red and the next character with a blue underline
 - Shows typing speed in characters per second after each sentence
 - Fun confetti effect when you finish a sentence
 
-Enjoy practicing your Hebrew typing skills!
+Enjoy practicing your typing skills!
