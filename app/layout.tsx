@@ -2,8 +2,8 @@ import './globals.css';
 import { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'Hebrew Typing Trainer',
-  description: 'Practice touch typing in Hebrew',
+  title: 'Multilingual Typing Trainer',
+  description: 'Practice touch typing in multiple languages',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
