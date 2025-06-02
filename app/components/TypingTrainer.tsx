@@ -10,6 +10,13 @@ export default function TypingTrainer() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [speed, setSpeed] = useState<number | null>(null);
 
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && Object.keys(dictionaries).includes(hash)) {
+      setLanguage(hash as Language);
+    }
+  }, []);
+
   const sentences = dictionaries[language];
   const sentence = sentences[index % sentences.length];
 
@@ -41,6 +48,7 @@ export default function TypingTrainer() {
   useEffect(() => {
     setIndex(0);
     setSpeed(null);
+    window.location.hash = language;
   }, [language]);
 
   const getCharClass = (char: string, idx: number) => {
