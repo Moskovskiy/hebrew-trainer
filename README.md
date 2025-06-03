@@ -15,7 +15,7 @@ The app will start in development mode on `http://localhost:3000`.
 
 - Displays over a thousand random sentences (around ten words each) for each supported language
 - Highlights correct letters in green, mistakes in red and the next character with a blue underline
-- Shows typing speed in characters per second after each sentence
+- Shows typing speed in characters per second and how many mistakes you made after each sentence
 - Fun confetti effect when you finish a sentence
 - Language choice reflected in the URL hash for easy sharing
 
