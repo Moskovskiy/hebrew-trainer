@@ -232,4 +232,5 @@ export function randomSentence(lang: Language): string {
 // console.log(randomSentence("spanish"));
 // console.log(randomSentence("chinese"));
 
-export { Language, wordBank };
+export type { Language };
+export { wordBank };
