@@ -5,6 +5,7 @@ import confetti from 'canvas-confetti';
 import LanguageSelector from './LanguageSelector';
 
 const languageOptions: { code: Language; name: string; emoji: string }[] = [
+  { code: 'english', name: 'English', emoji: '🇬🇧' },
   { code: 'hebrew', name: 'Hebrew', emoji: '🇮🇱' },
   { code: 'german', name: 'German', emoji: '🇩🇪' },
   { code: 'chinese', name: 'Chinese', emoji: '🇨🇳' },

@@ -12,7 +12,8 @@ type BaseLanguage =
   | "arabic"
   | "german"
   | "spanish"
-  | "hindi";
+  | "hindi"
+  | "english";
 
 type ExtraLanguage =
   | "thai"
@@ -202,6 +203,32 @@ const baseWordBank: Record<BaseLanguage, WordCategories> = {
     ],
     prepositions: [
       "में","से","तक","और","के बारे में","के लिए","क्योंकि","के माध्यम से","जैसे","की ओर"
+    ]
+  },
+
+  /* ---------- ENGLISH ---------- */
+  english: {
+    nouns: [
+      "cat","dog","child","teacher","student","city","mountain","river","sky","computer",
+      "phone","book","car","music","movie","flower","tree","ocean","friend","time",
+      "family","work","school","food","story","dream","heart","world","language","journey"
+    ],
+    verbs: [
+      "eat","drink","run","walk","see","hear","write","read","speak","laugh",
+      "cry","sleep","learn","teach","play","sing","dance","swim","draw","think",
+      "create","search","discover","share","help","change","remember","forget","begin","finish"
+    ],
+    adjectives: [
+      "beautiful","happy","fast","slow","tall","short","new","old","quiet","loud",
+      "warm","cold","simple","complex","bright","dark","strong","soft","rich","empty"
+    ],
+    adverbs: [
+      "gently","quickly","slowly","quietly","suddenly",
+      "often","sometimes","seriously","bravely","secretly"
+    ],
+    prepositions: [
+      "in","from","to","and","about",
+      "for","because","through","like","toward"
     ]
   }
 };
