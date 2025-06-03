@@ -4,6 +4,7 @@
  */
 
 type BaseLanguage =
+  | "english"
   | "chinese"
   | "japanese"
   | "hebrew"
@@ -43,6 +44,28 @@ interface WordCategories {
 /* -------- WORD BANK -------- */
 
 const baseWordBank: Record<BaseLanguage, WordCategories> = {
+  english: {
+    nouns: [
+      "cat","dog","child","teacher","student","city","mountain","river","sky","computer","phone","book",
+      "car","music","movie","flower","tree","sea","friend","time","family","work","school","food",
+      "story","dream","heart","world","language","journey"
+    ],
+    verbs: [
+      "eat","drink","run","walk","see","hear","write","read","talk","laugh","cry","sleep","learn","teach","play",
+      "sing","dance","swim","draw","think","create","search","discover","share","help","change","remember","forget",
+      "begin","end"
+    ],
+    adjectives: [
+      "beautiful","happy","fast","slow","tall","short","new","old","quiet","noisy","warm","cold",
+      "simple","complex","bright","dark","strong","soft","rich","empty"
+    ],
+    adverbs: [
+      "gently","quickly","slowly","quietly","suddenly","often","sometimes","seriously","bravely","secretly"
+    ],
+    prepositions: [
+      "in","from","to","with","about","for","because","through","like","at"
+    ]
+  },
   chinese: {
     nouns: [
       "猫","狗","孩子","老师","学生","城市","山","河","天空","电脑","手机","书","汽车","音乐","电影","花","树","海洋","朋友","时间","家庭","工作","学校","食物","故事","梦想","心","世界","语言","旅程"
