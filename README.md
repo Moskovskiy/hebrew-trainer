@@ -1,6 +1,6 @@
 # Multilingual Typing Trainer
 
-This is a small single page application for practicing blind keyboard typing. Originally focused on Hebrew, it now offers dictionaries for more than twenty languages including German, Chinese, Spanish, Arabic, Hindi, Telugu, Russian, Japanese, Thai, Korean, Armenian, Farsi, Greek, Ukrainian, Georgian, Gujarati, Burmese, Khmer, Sanskrit, Tibetan, Urdu and Marathi. The interface is in English and the sentences are shown in the selected language. It is built with **Next.js**, **React** and **Tailwind CSS** and can be deployed easily to Vercel.
+This is a small single page application for practicing blind keyboard typing. Originally focused on Hebrew, it now offers dictionaries for more than twenty languages including English, German, Chinese, Spanish, Arabic, Hindi, Telugu, Russian, Japanese, Thai, Korean, Armenian, Farsi, Greek, Ukrainian, Georgian, Gujarati, Burmese, Khmer, Sanskrit, Tibetan, Urdu and Marathi. The interface is in English and the sentences are shown in the selected language. It is built with **Next.js**, **React** and **Tailwind CSS** and can be deployed easily to Vercel.
 
 ## Development
 
