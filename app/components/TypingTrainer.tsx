@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { randomSentence, Language, wordBank } from '../data/dictionaries';
 import confetti from 'canvas-confetti';
+import LanguageSelector from './LanguageSelector';
 
 const languageOptions: { code: Language; name: string; emoji: string }[] = [
   { code: 'hebrew', name: 'Hebrew', emoji: '🇮🇱' },
@@ -37,7 +38,6 @@ export default function TypingTrainer() {
   const [speed, setSpeed] = useState<number | null>(null);
 
   const [sentence, setSentence] = useState('');
-  const [showPicker, setShowPicker] = useState(false);
 
   useEffect(() => {
     const hash = window.location.hash.replace('#', '');
@@ -95,44 +95,13 @@ export default function TypingTrainer() {
 
   const isRTL = language === 'hebrew' || language === 'arabic';
 
-  const selectedOption = languageOptions.find((o) => o.code === language);
-
   return (
     <div className="space-y-4">
-      <div className="relative inline-block">
-        <button
-          onClick={() => setShowPicker((p) => !p)}
-          className="px-3 py-1 rounded-full border text-sm flex items-center gap-1 bg-white hover:bg-gray-100"
-        >
-          <span>{selectedOption?.emoji}</span>
-          <span>{selectedOption?.name}</span>
-          <span className="ml-1">▾</span>
-        </button>
-        {showPicker && (
-          <div className="absolute left-0 mt-2 w-max bg-white border rounded shadow p-2 z-10">
-            <div className="flex gap-2 overflow-x-auto max-w-xs">
-              {languageOptions.map((opt) => (
-                <button
-                  key={opt.code}
-                  onClick={() => {
-                    setLanguage(opt.code);
-                    setShowPicker(false);
-                  }}
-                  className={
-                    `px-3 py-1 rounded-full border text-sm flex items-center gap-1 ` +
-                    (language === opt.code
-                      ? 'bg-blue-500 text-white border-blue-500'
-                      : 'bg-white hover:bg-gray-100')
-                  }
-                >
-                  <span>{opt.emoji}</span>
-                  <span>{opt.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      <LanguageSelector
+        options={languageOptions}
+        value={language}
+        onChange={setLanguage}
+      />
       {speed && (
         <div className="text-center text-xl font-bold">
           Speed: {speed.toFixed(2)} chars/sec
