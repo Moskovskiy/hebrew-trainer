@@ -54,7 +54,7 @@ export default function LanguageSelector({ options, value, onChange }: Props) {
       {/* Popup when open */}
       {open && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-20 p-4">
-          <div className="bg-white p-4 sm:p-6 rounded-2xl shadow w-full">
+          <div className="bg-white p-4 sm:p-6 rounded-2xl shadow w-full max-h-[80vh] overflow-y-auto">
             <div className="flex justify-end mb-4">
               <button onClick={() => setOpen(false)} className="text-xl">×</button>
             </div>
