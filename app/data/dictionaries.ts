@@ -1,27 +1,235 @@
-import hebrew from './hebrew';
-import german from './german';
-import chinese from './chinese';
-import spanish from './spanish';
-import arabic from './arabic';
-import english from './english';
-import hindi from './hindi';
-import telugu from './telugu';
-import russian from './russian';
-import japanese from './japanese';
+/** 
+ * Random-sentence generator for nine languages.
+ * Each language has ≥100 words split into five categories.
+ */
 
-const dictionaries = {
-  hebrew,
-  german,
-  chinese,
-  spanish,
-  arabic,
-  english,
-  hindi,
-  telugu,
-  russian,
-  japanese,
+type Language =
+  | "chinese"
+  | "japanese"
+  | "hebrew"
+  | "telugu"
+  | "russian"
+  | "arabic"
+  | "german"
+  | "spanish"
+  | "hindi";
+
+interface WordCategories {
+  nouns: string[];
+  verbs: string[];
+  adjectives: string[];
+  adverbs: string[];
+  prepositions: string[];
+}
+
+/* -------- WORD BANK -------- */
+
+const wordBank: Record<Language, WordCategories> = {
+  chinese: {
+    nouns: [
+      "猫","狗","孩子","老师","学生","城市","山","河","天空","电脑","手机","书","汽车","音乐","电影","花","树","海洋","朋友","时间","家庭","工作","学校","食物","故事","梦想","心","世界","语言","旅程"
+    ],
+    verbs: [
+      "吃","喝","跑","走","看","听","写","读","说","笑","哭","睡","学","教","玩","唱","跳","游","画","想","创造","寻找","发现","分享","帮助","改变","记住","忘记","开始","结束"
+    ],
+    adjectives: [
+      "美丽","快乐","快速","慢","高","低","新","旧","安静","吵闹","温暖","寒冷","简单","复杂","明亮","黑暗","坚强","柔软","丰富","空虚"
+    ],
+    adverbs: [
+      "轻轻地","快速地","慢慢地","安静地","突然","经常","偶尔","认真地","勇敢地","悄悄地"
+    ],
+    prepositions: [
+      "在","从","到","和","对","关于","为了","因为","通过","像"
+    ]
+  },
+
+  japanese: {
+    nouns: [
+      "猫","犬","子供","先生","学生","都市","山","川","空","パソコン","携帯","本","車","音楽","映画","花","木","海","友達","時間","家族","仕事","学校","食べ物","物語","夢","心","世界","言語","旅"
+    ],
+    verbs: [
+      "食べる","飲む","走る","歩く","見る","聞く","書く","読む","話す","笑う","泣く","寝る","学ぶ","教える","遊ぶ","歌う","踊る","泳ぐ","描く","考える","作る","探す","発見する","共有する","助ける","変える","覚える","忘れる","始める","終わる"
+    ],
+    adjectives: [
+      "美しい","楽しい","速い","遅い","高い","低い","新しい","古い","静か","騒がしい","暖かい","寒い","簡単","複雑","明るい","暗い","強い","柔らかい","豊か","空っぽ"
+    ],
+    adverbs: [
+      "静かに","急いで","ゆっくり","しばしば","たまに","真剣に","勇敢に","そっと","突然","確かに"
+    ],
+    prepositions: [
+      "で","から","まで","と","について","ために","によって","のように","へ","に"
+    ]
+  },
+
+  hebrew: {
+    nouns: [
+      "חתול","כלב","ילד","מורה","תלמיד","עיר","הר","נהר","שמיים","מחשב","טלפון","ספר","מכונית","מוזיקה","סרט","פרח","עץ","ים","חבר","זמן","משפחה","עבודה","בית ספר","אוכל","סיפור","חלום","לב","עולם","שפה","מסע"
+    ],
+    verbs: [
+      "לאכול","לשתות","לרוץ","ללכת","לראות","לשמוע","לכתוב","לקרוא","לדבר","לצחוק","לבכות","לישון","ללמוד","ללמד","לשחק","לשיר","לרקוד","לשחות","לצייר","לחשוב","ליצור","לחפש","לגלות","לשתף","לעזור","לשנות","לזכור","לשכוח","להתחיל","לסיים"
+    ],
+    adjectives: [
+      "יפה","שמח","מהיר","איטי","גבוה","נמוך","חדש","ישן","שקט","רועש","חם","קר","פשוט","מורכב","בהיר","כהה","חזק","רך","עשיר","ריק"
+    ],
+    adverbs: [
+      "בעדינות","במהירות","לאט","בשקט","פתאום","לעיתים קרובות","לפעמים","ברצינות","באומץ","בחשאי"
+    ],
+    prepositions: [
+      "ב","מ","ל","עם","על","בשביל","בגלל","דרך","כמו","אל"
+    ]
+  },
+
+  telugu: {
+    nouns: [
+      "పిల్లి","కుక్క","పాప","అధ్యాపకుడు","విధ్యార్థి","నగరం","పర్వతం","నది","ఆకాశం","కంప్యూటర్","ఫోన్","పుస్తకం","కారు","సంగీతం","చిత్రం","పువ్వు","చెట్టు","సముద్రం","స్నేహితుడు","సమయం","కుటుంబం","పని","పాఠశాల","ఆహారం","కథ","కల","గుండె","ప్రపంచం","భాష","ప్రయాణం"
+    ],
+    verbs: [
+      "తిను","తాగు","పరిగెత్తు","నడువు","చూడు","విన్ను","రాయి","చదువు","మాట్లాడు","నవ్వు","ఎడుచు","నిద్రపో","నేర్చుకో","బోధించు","ఆడు","పాడు","నాటు","ఈదు","చిత్రీకరించు","ఆలోచించు","సృష్టించు","శోధించు","కనుగొను","పంచు","సహాయంచేయి","మార్చు","గుర్తుపెట్టు","మర్చిపో","ప్రారంభించు","ముగింపు"
+    ],
+    adjectives: [
+      "అందమైన","సంతోషమైన","త్వరిత","నెమ్మదైన","ఎత్తు","తక్కువ","కొత్త","పాత","నిశ్శబ్ద","శబ్దకర","వెచ్చని","చలిక","సులభమైన","సంక్లిష్టమైన","ప్రకాశవంతమైన","చీకటి","బలమైన","మృదువైన","పుష్కలమైన","ఖాళీ"
+    ],
+    adverbs: [
+      "హృదయంగా","వేగంగా","నెమ్మదిగా","నిశ్శబ్దంగా","అचानक","తరచూ","కనిపిస్తుండగా","గంభీర్యంగా","ధైర్యంగా","సుతారంగా"
+    ],
+    prepositions: [
+      "లో","నుండి","వైపు","తో","గురించి","కోసం","ఎందుకంటే","ద్వారా","లాగా","వద్ద"
+    ]
+  },
+
+  russian: {
+    nouns: [
+      "кот","собака","ребёнок","учитель","студент","город","гора","река","небо","компьютер","телефон","книга","машина","музыка","фильм","цветок","дерево","море","друг","время","семья","работа","школа","еда","история","мечта","сердце","мир","язык","путешествие"
+    ],
+    verbs: [
+      "есть","пить","бежать","ходить","смотреть","слушать","писать","читать","говорить","смеяться","плакать","спать","учиться","учить","играть","петь","танцевать","плавать","рисовать","думать","создавать","искать","обнаружить","делиться","помогать","менять","помнить","забывать","начинать","заканчивать"
+    ],
+    adjectives: [
+      "красивый","радостный","быстрый","медленный","высокий","низкий","новый","старый","тихий","шумный","тёплый","холодный","простой","сложный","яркий","тёмный","сильный","мягкий","богатый","пустой"
+    ],
+    adverbs: [
+      "тихо","быстро","медленно","часто","иногда","серьёзно","смело","внезапно","аккуратно","скрытно"
+    ],
+    prepositions: [
+      "в","из","до","и","о","для","из-за","через","как","к"
+    ]
+  },
+
+  arabic: {
+    nouns: [
+      "قطة","كلب","طفل","معلم","طالب","مدينة","جبل","نهر","سماء","حاسوب","هاتف","كتاب","سيارة","موسيقى","فيلم","زهرة","شجرة","بحر","صديق","وقت","عائلة","عمل","مدرسة","طعام","قصة","حلم","قلب","عالم","لغة","رحلة"
+    ],
+    verbs: [
+      "يأكل","يشرب","يجري","يمشي","يشاهد","يسمع","يكتب","يقرأ","يتحدث","يضحك","يبكي","ينام","يتعلم","يُعلّم","يلعب","يغني","يرقص","يسبح","يرسم","يفكر","يُبدع","يبحث","يكتشف","يشارك","يساعد","يغيّر","يتذكر","ينسى","يبدأ","ينتهي"
+    ],
+    adjectives: [
+      "جميل","سعيد","سريع","بطيء","عالي","منخفض","جديد","قديم","هادئ","صاخب","دافئ","بارد","بسيط","معقد","مشرق","مظلم","قوي","ناعم","غني","فارغ"
+    ],
+    adverbs: [
+      "بهدوء","بسرعة","ببطء","غالبًا","أحيانًا","بجدية","بشجاعة","فجأة","بإتقان","بسِرّية"
+    ],
+    prepositions: [
+      "في","من","إلى","و","عن","لأجل","بسبب","عبر","مثل","على"
+    ]
+  },
+
+  german: {
+    nouns: [
+      "Katze","Hund","Kind","Lehrer","Student","Stadt","Berg","Fluss","Himmel","Computer","Telefon","Buch","Auto","Musik","Film","Blume","Baum","Meer","Freund","Zeit","Familie","Arbeit","Schule","Essen","Geschichte","Traum","Herz","Welt","Sprache","Reise"
+    ],
+    verbs: [
+      "essen","trinken","rennen","gehen","sehen","hören","schreiben","lesen","sprechen","lachen","weinen","schlafen","lernen","lehren","spielen","singen","tanzen","schwimmen","zeichnen","denken","erschaffen","suchen","entdecken","teilen","helfen","ändern","erinnern","vergessen","beginnen","beenden"
+    ],
+    adjectives: [
+      "schön","fröhlich","schnell","langsam","hoch","niedrig","neu","alt","leise","laut","warm","kalt","einfach","komplex","hell","dunkel","stark","weich","reich","leer"
+    ],
+    adverbs: [
+      "leise","schnell","langsam","oft","manchmal","ernsthaft","mutig","plötzlich","vorsichtig","heimlich"
+    ],
+    prepositions: [
+      "in","aus","bis","und","über","für","wegen","durch","wie","zu"
+    ]
+  },
+
+  spanish: {
+    nouns: [
+      "gato","perro","niño","maestro","estudiante","ciudad","montaña","río","cielo","computadora","teléfono","libro","coche","música","película","flor","árbol","mar","amigo","tiempo","familia","trabajo","escuela","comida","historia","sueño","corazón","mundo","idioma","viaje"
+    ],
+    verbs: [
+      "comer","beber","correr","caminar","ver","oír","escribir","leer","hablar","reír","llorar","dormir","aprender","enseñar","jugar","cantar","bailar","nadar","dibujar","pensar","crear","buscar","descubrir","compartir","ayudar","cambiar","recordar","olvidar","empezar","terminar"
+    ],
+    adjectives: [
+      "hermoso","feliz","rápido","lento","alto","bajo","nuevo","viejo","silencioso","ruidoso","cálido","frío","simple","complejo","brillante","oscuro","fuerte","suave","rico","vacío"
+    ],
+    adverbs: [
+      "suavemente","rápidamente","lentamente","a menudo","a veces","seriamente","valientemente","repentinamente","cuidadosamente","en secreto"
+    ],
+    prepositions: [
+      "en","de","hasta","y","sobre","para","debido a","a través de","como","hacia"
+    ]
+  },
+
+  hindi: {
+    nouns: [
+      "बिल्ली","कुत्ता","बच्चा","शिक्षक","छात्र","शहर","पहाड़","नदी","आसमान","कंप्यूटर","फ़ोन","किताब","कार","संगीत","फ़िल्म","फूल","पेड़","समुद्र","दोस्त","समय","परिवार","काम","स्कूल","भोजन","कहानी","सपना","दिल","दुनिया","भाषा","यात्रा"
+    ],
+    verbs: [
+      "खाना","पीना","दौड़ना","चलना","देखना","सुनना","लिखना","पढ़ना","बोलना","हँसना","रोना","सोना","सीखना","सिखाना","खेलना","गाना","नाचना","तैरना","चित्र बनाना","सोचना","सृजन करना","खोजना","खोज लेना","साझा करना","मदद करना","बदलना","याद रखना","भूलना","शुरू करना","समाप्त करना"
+    ],
+    adjectives: [
+      "सुंदर","खुश","तेज़","धीमा","ऊँचा","नीचा","नया","पुराना","शांत","शोर","गर्म","ठंडा","सरल","जटिल","उज्ज्वल","अँधेरा","मज़बूत","नरम","समृद्ध","खाली"
+    ],
+    adverbs: [
+      "धीरे से","तेज़ी से","धीमी गति से","शांतिपूर्वक","अचानक","अक्सर","कभी-कभी","गंभीरता से","साहसपूर्वक","चुपके से"
+    ],
+    prepositions: [
+      "में","से","तक","और","के बारे में","के लिए","क्योंकि","के माध्यम से","जैसे","की ओर"
+    ]
+  }
 };
 
-export type Language = keyof typeof dictionaries;
+/* -------- UTILITIES -------- */
 
-export default dictionaries;
+function randomElement<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/* -------- SENTENCE GENERATOR -------- */
+
+/**
+ * Produces a 10-word random sentence for the requested language.
+ * Very basic template: adj noun adv verb prep adj noun adv verb noun
+ */
+export function randomSentence(lang: Language): string {
+  const wb = wordBank[lang];
+  if (!wb) {
+    throw new Error(`Unsupported language: ${lang}`);
+  }
+
+  const structure: (keyof WordCategories)[] = [
+    "adjectives",
+    "nouns",
+    "adverbs",
+    "verbs",
+    "prepositions",
+    "adjectives",
+    "nouns",
+    "adverbs",
+    "verbs",
+    "nouns"
+  ];
+
+  const words = structure.map((cat) => randomElement(wb[cat]));
+
+  // Languages without word spacing by default
+  const noSpace = lang === "chinese" || lang === "japanese";
+
+  const sentence = noSpace ? words.join("") : words.join(" ");
+  return sentence;
+}
+
+/* ---------- EXAMPLE ---------- */
+// console.log(randomSentence("spanish"));
+// console.log(randomSentence("chinese"));
+
+export { Language, wordBank };

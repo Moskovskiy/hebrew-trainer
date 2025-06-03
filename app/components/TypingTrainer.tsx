@@ -1,10 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
-import dictionaries, { Language } from '../data/dictionaries';
+import { randomSentence, Language, wordBank } from '../data/dictionaries';
 import confetti from 'canvas-confetti';
 
 const languageOptions: { code: Language; name: string; emoji: string }[] = [
-  { code: 'english', name: 'English', emoji: '🇺🇸' },
   { code: 'hebrew', name: 'Hebrew', emoji: '🇮🇱' },
   { code: 'german', name: 'German', emoji: '🇩🇪' },
   { code: 'chinese', name: 'Chinese', emoji: '🇨🇳' },
@@ -17,21 +16,24 @@ const languageOptions: { code: Language; name: string; emoji: string }[] = [
 ];
 
 export default function TypingTrainer() {
-  const [language, setLanguage] = useState<Language>('english');
+  const [language, setLanguage] = useState<Language>('hebrew');
   const [index, setIndex] = useState(0);
   const [input, setInput] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
   const [speed, setSpeed] = useState<number | null>(null);
 
+  const [sentence, setSentence] = useState('');
+
   useEffect(() => {
     const hash = window.location.hash.replace('#', '');
-    if (hash && Object.keys(dictionaries).includes(hash)) {
+    if (hash && Object.keys(wordBank).includes(hash)) {
       setLanguage(hash as Language);
     }
   }, []);
 
-  const sentences = dictionaries[language];
-  const sentence = sentences[index % sentences.length];
+  useEffect(() => {
+    setSentence(randomSentence(language));
+  }, [language, index]);
 
   useEffect(() => {
     setInput('');
@@ -53,10 +55,10 @@ export default function TypingTrainer() {
         setSpeed(speedVal);
         confetti();
       }
-      const next = (index + 1) % sentences.length;
+      const next = index + 1;
       setTimeout(() => setIndex(next), 500);
     }
-  }, [input, sentence, startTime, index, sentences.length]);
+  }, [input, sentence, startTime, index]);
 
   useEffect(() => {
     setIndex(0);
