@@ -36,6 +36,8 @@ export default function TypingTrainer() {
   const [input, setInput] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
   const [speed, setSpeed] = useState<number | null>(null);
+  const [mistakes, setMistakes] = useState(0);
+  const [resultMistakes, setResultMistakes] = useState<number | null>(null);
 
   const [sentence, setSentence] = useState('');
 
@@ -53,13 +55,23 @@ export default function TypingTrainer() {
   useEffect(() => {
     setInput('');
     setStartTime(null);
+    setMistakes(0);
+    setResultMistakes(null);
   }, [index, language]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (startTime === null && e.target.value.length === 1) {
       setStartTime(Date.now());
     }
-    setInput(e.target.value);
+    const newValue = e.target.value;
+    if (newValue.length > input.length) {
+      const idx = newValue.length - 1;
+      const char = newValue[idx];
+      if (idx >= sentence.length || char !== sentence[idx]) {
+        setMistakes(m => m + 1);
+      }
+    }
+    setInput(newValue);
   };
 
   useEffect(() => {
@@ -68,16 +80,18 @@ export default function TypingTrainer() {
         const seconds = (Date.now() - startTime) / 1000;
         const speedVal = sentence.length / seconds;
         setSpeed(speedVal);
+        setResultMistakes(mistakes);
         confetti();
       }
       const next = index + 1;
       setTimeout(() => setIndex(next), 500);
     }
-  }, [input, sentence, startTime, index]);
+  }, [input, sentence, startTime, index, mistakes]);
 
   useEffect(() => {
     setIndex(0);
     setSpeed(null);
+    setResultMistakes(null);
     window.location.hash = language;
   }, [language]);
 
@@ -105,6 +119,9 @@ export default function TypingTrainer() {
       {speed && (
         <div className="text-center text-xl font-bold">
           Speed: {speed.toFixed(2)} chars/sec
+          {resultMistakes !== null && (
+            <span className="ml-4">Mistakes: {resultMistakes}</span>
+          )}
         </div>
       )}
       <div
