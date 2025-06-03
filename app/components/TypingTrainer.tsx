@@ -13,6 +13,20 @@ const languageOptions: { code: Language; name: string; emoji: string }[] = [
   { code: 'telugu', name: 'Telugu', emoji: '🇮🇳' },
   { code: 'russian', name: 'Russian', emoji: '🇷🇺' },
   { code: 'japanese', name: 'Japanese', emoji: '🇯🇵' },
+  { code: 'thai', name: 'Thai', emoji: '🇹🇭' },
+  { code: 'korean', name: 'Korean', emoji: '🇰🇷' },
+  { code: 'armenian', name: 'Armenian', emoji: '🇦🇲' },
+  { code: 'farsi', name: 'Farsi', emoji: '🇮🇷' },
+  { code: 'greek', name: 'Greek', emoji: '🇬🇷' },
+  { code: 'ukrainian', name: 'Ukrainian', emoji: '🇺🇦' },
+  { code: 'georgian', name: 'Georgian', emoji: '🇬🇪' },
+  { code: 'gujarati', name: 'Gujarati', emoji: '🇮🇳' },
+  { code: 'myanmar', name: 'Burmese', emoji: '🇲🇲' },
+  { code: 'khmer', name: 'Khmer', emoji: '🇰🇭' },
+  { code: 'sanskrit', name: 'Sanskrit', emoji: '🇮🇳' },
+  { code: 'tibetan', name: 'Tibetan', emoji: '🇨🇳' },
+  { code: 'urdu', name: 'Urdu', emoji: '🇵🇰' },
+  { code: 'marathi', name: 'Marathi', emoji: '🇮🇳' },
 ];
 
 export default function TypingTrainer() {
