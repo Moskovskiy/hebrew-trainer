@@ -1,6 +1,6 @@
 'use client';
 
-import { formatSounds, hebrewLetters } from '../data/hebrewLetters';
+import { formatSounds, getDisplayLetters, hebrewLetters } from '../data/hebrewLetters';
 
 const letterEmphasisClasses = (isFinal?: boolean) => {
   if (isFinal) {
@@ -23,6 +23,7 @@ export default function LearnLetters() {
     <div className="flex w-full flex-col gap-5">
       {hebrewLetters.map(letter => {
         const emphasis = letterEmphasisClasses(letter.isFinal);
+        const displayLetters = getDisplayLetters(letter);
 
         return (
           <article
@@ -40,7 +41,7 @@ export default function LearnLetters() {
                 <span className="sr-only">
                   {letter.letter} – {letter.name}
                 </span>
-                {[0, 1, 2].map(position => (
+                {displayLetters.map((glyph, position) => (
                   <span
                     key={`${letter.letter}-${position}`}
                     className={`font-bold transition-colors duration-200 ${emphasis[position]}`}
