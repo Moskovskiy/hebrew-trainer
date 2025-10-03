@@ -41,6 +41,7 @@ export default function TypingTrainer() {
   const [resultMistakes, setResultMistakes] = useState<number | null>(null);
 
   const [sentence, setSentence] = useState('');
+  const activeLanguage = languageOptions.find(option => option.code === language);
 
   useEffect(() => {
     const hash = window.location.hash.replace('#', '');
@@ -111,38 +112,58 @@ export default function TypingTrainer() {
   const isRTL = language === 'hebrew' || language === 'arabic';
 
   return (
-    <div className="space-y-4">
-      <LanguageSelector
-        options={languageOptions}
-        value={language}
-        onChange={setLanguage}
-      />
-      {speed && (
-        <div className="text-center text-xl font-bold">
-          Speed: {speed.toFixed(2)} chars/sec
-          {resultMistakes !== null && (
-            <span className="ml-4">Mistakes: {resultMistakes}</span>
-          )}
+    <div className="flex w-full flex-col gap-6">
+      <div className="mx-auto w-full max-w-2xl rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl shadow-slate-900/5 backdrop-blur-lg sm:p-8">
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <LanguageSelector options={languageOptions} value={language} onChange={setLanguage} />
+            <p className="max-w-md text-sm text-slate-500">
+              Type the prompt below as quickly and accurately as you can. We will calculate your characters per second and track
+              mistakes for each sentence.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 rounded-2xl bg-slate-900/90 p-4 text-white shadow-inner sm:grid-cols-3">
+            <div className="text-center">
+              <div className="text-xs uppercase tracking-[0.3em] text-slate-300">Language</div>
+              <div className="mt-1 text-lg font-semibold">{activeLanguage?.name ?? '—'}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-xs uppercase tracking-[0.3em] text-slate-300">Speed</div>
+              <div className="mt-1 text-lg font-semibold text-emerald-300">
+                {speed ? `${speed.toFixed(2)} chars/sec` : '—'}
+              </div>
+            </div>
+            <div className="col-span-2 text-center sm:col-span-1">
+              <div className="text-xs uppercase tracking-[0.3em] text-slate-300">Mistakes</div>
+              <div className="mt-1 text-lg font-semibold text-rose-300">
+                {resultMistakes !== null ? resultMistakes : mistakes}
+              </div>
+            </div>
+          </div>
+
+          <div
+            dir={isRTL ? 'rtl' : 'ltr'}
+            className="min-h-[6rem] rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-emerald-50 p-6 text-2xl font-semibold tracking-wide text-slate-900 shadow-md"
+          >
+            {sentence.split('').map((char, idx) => (
+              <span key={idx} className={getCharClass(char, idx)}>
+                {char}
+              </span>
+            ))}
+          </div>
+
+          <input
+            type="text"
+            dir={isRTL ? 'rtl' : 'ltr'}
+            autoFocus
+            value={input}
+            onChange={handleChange}
+            className="w-full rounded-2xl border-2 border-slate-200 bg-white/90 px-4 py-3 text-lg font-medium text-slate-900 shadow-sm transition focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-200"
+            placeholder="Start typing here..."
+          />
         </div>
-      )}
-      <div
-        dir={isRTL ? 'rtl' : 'ltr'}
-        className="text-2xl bg-white p-4 rounded shadow min-h-[4rem] font-medium tracking-wide"
-      >
-        {sentence.split('').map((char, idx) => (
-          <span key={idx} className={getCharClass(char, idx)}>
-            {char}
-          </span>
-        ))}
       </div>
-      <input
-        type="text"
-        dir={isRTL ? 'rtl' : 'ltr'}
-        autoFocus
-        value={input}
-        onChange={handleChange}
-        className="w-full p-3 border rounded focus:outline-none text-xl"
-      />
     </div>
   );
 }
