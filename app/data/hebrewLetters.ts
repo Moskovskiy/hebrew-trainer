@@ -2,7 +2,6 @@ export interface HebrewLetter {
   letter: string;
   name: string;
   sounds: string[];
-  isFinal?: boolean;
 }
 
 export const hebrewLetters: HebrewLetter[] = [
@@ -17,18 +16,18 @@ export const hebrewLetters: HebrewLetter[] = [
   { letter: 'ט', name: 'Tet', sounds: ['T (Tet)'] },
   { letter: 'י', name: 'Yod', sounds: ['Y', 'I'] },
   { letter: 'כ', name: 'Kaf', sounds: ['Kh (Kaf)'] },
-  { letter: 'ך', name: 'Final Kaf', sounds: ['Kh (final)'], isFinal: true },
+  { letter: 'ך', name: 'Final Kaf', sounds: ['Kh (final)'] },
   { letter: 'ל', name: 'Lamed', sounds: ['L'] },
   { letter: 'מ', name: 'Mem', sounds: ['M'] },
-  { letter: 'ם', name: 'Final Mem', sounds: ['M (final)'], isFinal: true },
+  { letter: 'ם', name: 'Final Mem', sounds: ['M (final)'] },
   { letter: 'נ', name: 'Nun', sounds: ['N'] },
-  { letter: 'ן', name: 'Final Nun', sounds: ['N (final)'], isFinal: true },
+  { letter: 'ן', name: 'Final Nun', sounds: ['N (final)'] },
   { letter: 'ס', name: 'Samekh', sounds: ['S (Samekh)'] },
   { letter: 'ע', name: 'Ayin', sounds: ['Ah (deep)', 'Silent throat'] },
   { letter: 'פ', name: 'Pe', sounds: ['P'] },
-  { letter: 'ף', name: 'Final Pe', sounds: ['F (final)'], isFinal: true },
+  { letter: 'ף', name: 'Final Pe', sounds: ['F (final)'] },
   { letter: 'צ', name: 'Tsadi', sounds: ['Ts'] },
-  { letter: 'ץ', name: 'Final Tsadi', sounds: ['Ts (final)'], isFinal: true },
+  { letter: 'ץ', name: 'Final Tsadi', sounds: ['Ts (final)'] },
   { letter: 'ק', name: 'Qof', sounds: ['K (deep)'] },
   { letter: 'ר', name: 'Resh', sounds: ['R'] },
   { letter: 'שׁ', name: 'Shin', sounds: ['Sh'] },
