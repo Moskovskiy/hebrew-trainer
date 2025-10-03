@@ -47,7 +47,7 @@ export default function LearnLetters() {
                     className={`font-bold transition-colors duration-200 ${emphasis[position]}`}
                     aria-hidden="true"
                   >
-                    {glyph}
+                    {letter.letter}
                   </span>
                 ))}
               </div>

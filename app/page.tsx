@@ -1,4 +1,5 @@
 import TrainerTabs from './components/TrainerTabs';
+import HebrewLetterTrainer from './components/HebrewLetterTrainer';
 
 export default function Home() {
   return (
@@ -12,6 +13,10 @@ export default function Home() {
           every glyph at a glance. Choose a mode below to get started.
         </p>
         <TrainerTabs />
+          Strengthen your Hebrew reading intuition by matching each letter with its sound.
+          Tap an answer to see instant feedback and grow your score.
+        </p>
+        <HebrewLetterTrainer />
       </div>
     </main>
   );
