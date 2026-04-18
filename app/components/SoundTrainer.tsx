@@ -20,6 +20,7 @@ type SoundTrainerProps = {
   entries: SoundEntry[];
   promptLabel: string;
   instructionText: string;
+  onStatsChange?: (stats: { label: string; value: string | number }[]) => void;
 };
 
 const pickRandomIndex = (length: number, exclude?: number) => {
@@ -48,10 +49,26 @@ const buildOptionSet = (entries: SoundEntry[], currentIndex: number) => {
     .slice(0, 4);
 };
 
+function RefreshIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="h-4 w-4 fill-none stroke-current stroke-[1.9]"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 12a9 9 0 1 1-3.15-6.86" />
+      <path d="M21 3v6h-6" />
+    </svg>
+  );
+}
+
 export default function SoundTrainer({
   entries,
   promptLabel,
   instructionText,
+  onStatsChange,
 }: SoundTrainerProps) {
   const [score, setScore] = useState<Score>(INITIAL_SCORE);
   const [currentIndex, setCurrentIndex] = useState(() => pickRandomIndex(entries.length));
@@ -67,6 +84,14 @@ export default function SoundTrainer({
     setOptions(buildOptionSet(entries, currentIndex));
     setSelectedOption(null);
   }, [entries, currentIndex]);
+
+  useEffect(() => {
+    onStatsChange?.([
+      { label: 'Correct', value: score.correct },
+      { label: 'Incorrect', value: score.incorrect },
+      { label: 'Accuracy', value: accuracy !== null ? `${accuracy}%` : '—' },
+    ]);
+  }, [accuracy, onStatsChange, score.correct, score.incorrect]);
 
   const goToNextSymbol = () => {
     setCurrentIndex(previous => pickRandomIndex(entries.length, previous));
@@ -99,37 +124,47 @@ export default function SoundTrainer({
 
   const getOptionClassName = (option: string) => {
     const baseStyles =
-      'flex min-h-[4.5rem] items-center justify-center border px-4 py-4 text-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:text-base';
+      'flex min-h-[4rem] items-center justify-center rounded-2xl px-4 py-3 text-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:min-h-[4.5rem] sm:px-5 sm:py-4 sm:text-base';
 
     if (!selectedOption) {
-      return `${baseStyles} border-[var(--border)] text-zinc-700 hover:border-zinc-950 hover:text-zinc-950`;
+      return `${baseStyles} text-zinc-700 hover:bg-zinc-950 hover:text-white`;
     }
 
     if (option === correctOption) {
-      return `${baseStyles} border-zinc-950 bg-zinc-950 text-white`;
+      return `${baseStyles} bg-zinc-950 text-white`;
     }
 
     if (option === selectedOption) {
-      return `${baseStyles} border-zinc-950 text-zinc-400`;
+      return `${baseStyles} bg-zinc-100 text-zinc-400`;
     }
 
-    return `${baseStyles} border-[var(--border)] text-zinc-400`;
+    return `${baseStyles} text-zinc-400`;
   };
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem]">
-      <section className="p-6 sm:p-8">
-        <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
+      <section className="p-4 sm:p-6">
+        <div className="flex flex-col gap-4">
           <div
-            className="border border-[var(--border)] p-8 text-center"
+            className="relative rounded-[2rem] bg-zinc-100/70 px-6 py-8 text-center sm:px-8 sm:py-10"
             aria-label={`${promptLabel} ${entries[currentIndex].symbol}`}
           >
-            <div className="text-[5rem] font-medium leading-none text-zinc-950 sm:text-[6.5rem]">
+            <button
+              type="button"
+              onClick={goToNextSymbol}
+              className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-500 transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
+              aria-label="Skip to the next card"
+              title="Skip"
+            >
+              <RefreshIcon />
+            </button>
+            <p className="sr-only">{instructionText}</p>
+            <div className="text-[4.5rem] font-medium leading-none text-zinc-950 sm:text-[6.25rem]">
               {entries[currentIndex].symbol}
             </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-2 sm:grid-cols-2">
             {options.map(option => (
               <button
                 key={option}
@@ -141,22 +176,11 @@ export default function SoundTrainer({
               </button>
             ))}
           </div>
-
-          <div className="flex flex-col gap-4 border-t border-[var(--border)] pt-4 text-sm text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
-            <p>{instructionText}</p>
-            <button
-              type="button"
-              onClick={goToNextSymbol}
-              className="inline-flex items-center justify-center border border-zinc-950 px-4 py-2 text-sm font-medium text-zinc-950 transition hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
-            >
-              Skip
-            </button>
-          </div>
         </div>
       </section>
 
-      <aside className="border-t border-[var(--border)] p-5 lg:border-l lg:border-t-0 lg:pl-6">
-        <div className="space-y-5 text-sm">
+      <aside className="p-4 pt-0 lg:hidden">
+        <div className="space-y-4 text-sm">
           <div>
             <p className="text-zinc-500">Correct</p>
             <p className="mt-1 text-2xl font-medium text-zinc-950">{score.correct}</p>

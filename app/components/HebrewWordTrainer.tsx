@@ -35,7 +35,11 @@ const buildOptionSet = (currentIndex: number) => {
   return Array.from(options).sort(() => Math.random() - 0.5);
 };
 
-export default function HebrewWordTrainer() {
+export default function HebrewWordTrainer({
+  onStatsChange,
+}: {
+  onStatsChange?: (stats: { label: string; value: string | number }[]) => void;
+}) {
   const [score, setScore] = useState<Score>(INITIAL_SCORE);
   const [currentIndex, setCurrentIndex] = useState(() => pickRandomIndex(hebrewCommonWords.length));
   const [options, setOptions] = useState(() => buildOptionSet(currentIndex));
@@ -49,6 +53,14 @@ export default function HebrewWordTrainer() {
     setOptions(buildOptionSet(currentIndex));
     setSelectedOption(null);
   }, [currentIndex]);
+
+  useEffect(() => {
+    onStatsChange?.([
+      { label: 'Correct', value: score.correct },
+      { label: 'Incorrect', value: score.incorrect },
+      { label: 'Accuracy', value: accuracy !== null ? `${accuracy}%` : '—' },
+    ]);
+  }, [accuracy, onStatsChange, score.correct, score.incorrect]);
 
   useEffect(() => {
     if (!selectedOption) {
@@ -100,7 +112,7 @@ export default function HebrewWordTrainer() {
   };
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem]">
+    <div className="flex flex-col gap-8">
       <section className="p-6 sm:p-8">
         <div className="flex flex-col gap-6">
           <div
@@ -140,7 +152,7 @@ export default function HebrewWordTrainer() {
         </div>
       </section>
 
-      <aside className="border-t border-[var(--border)] p-5 lg:border-l lg:border-t-0 lg:pl-6">
+      <aside className="border-t border-[var(--border)] p-5 lg:hidden">
         <div className="space-y-5 text-sm">
           <div>
             <p className="text-zinc-500">Words</p>

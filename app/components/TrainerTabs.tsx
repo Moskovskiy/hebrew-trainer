@@ -4,6 +4,7 @@ import { cherokeeLetters } from '../data/cherokee';
 import { copticLetters } from '../data/coptic';
 import { emojiEntries } from '../data/emoji';
 import { javaneseLetters } from '../data/javanese';
+import { hiraganaLetters, katakanaLetters } from '../data/japaneseKana';
 import { maldivianLetters } from '../data/maldivian';
 import { osageLetters } from '../data/osage';
 import { qaniujaaqpaitEntries } from '../data/qaniujaaqpait';
@@ -22,7 +23,6 @@ import {
   georgianLetters,
   greekLetters,
   gujaratiLetters,
-  japaneseKana,
   khmerLetters,
   myanmarLetters,
   russianLetters,
@@ -35,7 +35,8 @@ export type StudyLanguage =
   | 'english'
   | 'hebrew'
   | 'chinese'
-  | 'japanese'
+  | 'hiragana'
+  | 'katakana'
   | 'korean'
   | 'russian'
   | 'ethiopian'
@@ -102,16 +103,28 @@ export const tabsByLanguage: Record<
       description: 'Match common Chinese characters to their usual pronunciations.',
     },
   ],
-  japanese: [
+  hiragana: [
     {
       value: 'typing',
       label: 'Keyboard Practice',
-      description: 'Type generated Japanese prompts with your IME and stay comfortable across kana and kanji.',
+      description: 'Type generated Hiragana prompts and build confidence with core Japanese syllables.',
     },
     {
       value: 'letters',
       label: 'Sound Practice',
-      description: 'Match core Japanese kana to their usual sounds.',
+      description: 'Match Hiragana symbols to their usual sounds.',
+    },
+  ],
+  katakana: [
+    {
+      value: 'typing',
+      label: 'Keyboard Practice',
+      description: 'Type generated Katakana prompts and build confidence with core Japanese syllables.',
+    },
+    {
+      value: 'letters',
+      label: 'Sound Practice',
+      description: 'Match Katakana symbols to their usual sounds.',
     },
   ],
   korean: [
@@ -395,25 +408,35 @@ export const tabsByLanguage: Record<
 export default function TrainerTabs({
   language,
   activeTab,
+  onStatsChange,
+  onVirtualKeyHandlerChange,
 }: {
   language: StudyLanguage;
   activeTab: TabValue;
+  onStatsChange?: (stats: { label: string; value: string | number }[]) => void;
+  onVirtualKeyHandlerChange?: (handler: ((key: string) => void) | null) => void;
 }) {
   const renderContent = (value: TabValue) => {
     if (value === 'typing') {
-      return <TypingTrainer language={language} />;
+      return (
+        <TypingTrainer
+          language={language}
+          onStatsChange={onStatsChange}
+          onVirtualKeyHandlerChange={onVirtualKeyHandlerChange}
+        />
+      );
     }
 
     if (value === 'words' && language === 'hebrew') {
-      return <HebrewWordTrainer />;
+      return <HebrewWordTrainer onStatsChange={onStatsChange} />;
     }
 
     if (language === 'hebrew') {
-      return <HebrewLetterTrainer />;
+      return <HebrewLetterTrainer onStatsChange={onStatsChange} />;
     }
 
     if (language === 'korean') {
-      return <KoreanLetterTrainer />;
+      return <KoreanLetterTrainer onStatsChange={onStatsChange} />;
     }
 
     const letterPracticeByLanguage = {
@@ -423,11 +446,17 @@ export default function TrainerTabs({
         instructionText:
           'Choose the sound that best matches the Chinese character. The next card appears automatically.',
       },
-      japanese: {
-        entries: japaneseKana,
-        promptLabel: 'Japanese kana',
+      hiragana: {
+        entries: hiraganaLetters,
+        promptLabel: 'Hiragana kana',
         instructionText:
-          'Choose the sound that best matches the Japanese kana. The next card appears automatically.',
+          'Choose the sound that best matches the Hiragana symbol. The next card appears automatically.',
+      },
+      katakana: {
+        entries: katakanaLetters,
+        promptLabel: 'Katakana kana',
+        instructionText:
+          'Choose the sound that best matches the Katakana symbol. The next card appears automatically.',
       },
       russian: {
         entries: russianLetters,
@@ -577,6 +606,7 @@ export default function TrainerTabs({
         entries={practiceConfig.entries}
         promptLabel={practiceConfig.promptLabel}
         instructionText={practiceConfig.instructionText}
+        onStatsChange={onStatsChange}
       />
     );
   };

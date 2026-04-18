@@ -5,16 +5,75 @@ import { type ReactNode, useEffect, useState } from 'react';
 import TrainerTabs, { tabsByLanguage, type StudyLanguage, type TabValue } from './TrainerTabs';
 import HebrewKeyboardLayout from './HebrewKeyboardLayout';
 import KoreanKeyboardLayout from './KoreanKeyboardLayout';
+import { VirtualKeyboardContext, useVirtualKeyboard } from './VirtualKeyboardContext';
 
 type Keycap = string | { main: string; sub?: string };
+type SidebarStat = { label: string; value: string | number };
 
-const tabLabels: Record<TabValue, string> = {
-  typing: 'Type',
-  letters: 'Letters',
-  words: 'Words',
+const usTopLegendRow = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\'];
+const usHomeLegendRow = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'"];
+const usBottomLegendRow = ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'];
+const usNumberLegendRow = ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='];
+const defaultNumberRow: Keycap[] = usNumberLegendRow.map(key => ({ main: '', sub: key }));
+
+const keyboardLegendOverrides: Partial<Record<string, string[][]>> = {
+  el: [usHomeLegendRow.slice(1), usHomeLegendRow.slice(0, 9), usBottomLegendRow.slice(0, 7)],
 };
 
-function AppLogo({
+const defaultLetterLegendRows = [usTopLegendRow, usHomeLegendRow, usBottomLegendRow];
+
+function KeyboardIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5 fill-none stroke-current stroke-[1.8]">
+      <rect x="3.5" y="6" width="17" height="12" rx="2.5" />
+      <path d="M7 10h.01M10 10h.01M13 10h.01M16 10h.01M7 13h.01M10 13h.01M13 13h4" />
+    </svg>
+  );
+}
+
+function SoundIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5 fill-none stroke-current stroke-[1.8]">
+      <path d="M5 10.5v3h3l4 3.5v-10L8 10.5H5Z" />
+      <path d="M16 9.5a4 4 0 0 1 0 5" />
+      <path d="M18.5 7a7.5 7.5 0 0 1 0 10" />
+    </svg>
+  );
+}
+
+function WordsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5 fill-none stroke-current stroke-[1.8]">
+      <rect x="4" y="5" width="16" height="14" rx="2.5" />
+      <path d="M8 9.5h8M8 12.5h8M8 15.5h5" />
+    </svg>
+  );
+}
+
+function BrandMark() {
+  const glyphs = ['ა', 'あ', 'ع', '가'];
+
+  return (
+    <div className="grid h-9 w-9 grid-cols-2 overflow-hidden border border-zinc-950">
+      {glyphs.map((glyph, index) => {
+        const isDark = index === 0 || index === 3;
+
+        return (
+          <div
+            key={glyph}
+            className={`flex items-center justify-center text-[0.7rem] font-medium leading-none ${
+              isDark ? 'bg-zinc-950 text-white' : 'bg-transparent text-zinc-950'
+            } ${index < 2 ? 'border-b' : ''} ${index % 2 === 0 ? 'border-r' : ''} border-zinc-950`}
+          >
+            {glyph}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PracticeModeSwitch({
   activeLanguage,
   activeTab,
   activeTabs,
@@ -25,60 +84,49 @@ function AppLogo({
   activeTabs: { value: TabValue; label: string; description: string }[];
   onTabChange: (value: TabValue) => void;
 }) {
-  const glyphs = ['ა', 'あ', 'ع', '가'];
+  const tabIcons: Record<TabValue, ReactNode> = {
+    typing: <KeyboardIcon />,
+    letters: <SoundIcon />,
+    words: <WordsIcon />,
+  };
+  const tabText: Record<TabValue, string> = {
+    typing: 'Speed test',
+    letters: 'Guess letter',
+    words: 'Words',
+  };
 
   return (
-    <div className="pb-1">
-      <div className="flex items-center gap-4">
-        <div className="grid h-14 w-14 grid-cols-2 overflow-hidden border border-zinc-950">
-          {glyphs.map((glyph, index) => {
-            const isDark = index === 0 || index === 3;
+    <nav
+      className="flex items-center justify-center gap-1"
+      role="tablist"
+      aria-label={`${activeLanguage} trainer exercises`}
+    >
+      {activeTabs.map(tab => {
+        const isActive = tab.value === activeTab;
 
-            return (
-              <div
-                key={glyph}
-                className={`flex items-center justify-center text-base font-medium leading-none ${
-                  isDark ? 'bg-zinc-950 text-white' : 'bg-transparent text-zinc-950'
-                } ${index < 2 ? 'border-b' : ''} ${index % 2 === 0 ? 'border-r' : ''} border-zinc-950`}
-              >
-                {glyph}
-              </div>
-            );
-          })}
-        </div>
-
-        <nav
-          className="flex min-w-0 flex-1 items-center rounded-full border border-[var(--border)] p-1"
-          role="tablist"
-          aria-label={`${activeLanguage} trainer exercises`}
-        >
-          {activeTabs.map(tab => {
-            const isActive = tab.value === activeTab;
-
-            return (
-              <button
-                key={tab.value}
-                type="button"
-                className={`flex h-10 min-w-0 flex-1 items-center justify-center rounded-full px-3 text-[0.62rem] font-medium uppercase tracking-[0.12em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:text-[0.68rem] ${
-                  isActive
-                    ? 'bg-zinc-950 text-white'
-                    : 'bg-transparent text-zinc-500 hover:text-zinc-950'
-                }`}
-                onClick={() => onTabChange(tab.value)}
-                aria-selected={isActive}
-                role="tab"
-                tabIndex={isActive ? 0 : -1}
-                id={`trainer-tab-${activeLanguage}-${tab.value}`}
-                aria-controls={`trainer-tabpanel-${activeLanguage}-${tab.value}`}
-                title={tab.label}
-              >
-                <span className="truncate">{tabLabels[tab.value]}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-    </div>
+        return (
+          <button
+            key={tab.value}
+            type="button"
+            className={`inline-flex h-8 items-center justify-center gap-1.5 rounded-full px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 ${
+              isActive
+                ? 'bg-zinc-950 text-white'
+                : 'bg-transparent text-zinc-500 hover:text-zinc-950'
+            }`}
+            onClick={() => onTabChange(tab.value)}
+            aria-selected={isActive}
+            role="tab"
+            tabIndex={isActive ? 0 : -1}
+            id={`trainer-tab-${activeLanguage}-${tab.value}`}
+            aria-controls={`trainer-tabpanel-${activeLanguage}-${tab.value}`}
+            title={tab.label}
+          >
+            {tabIcons[tab.value]}
+            <span>{tabText[tab.value]}</span>
+          </button>
+        );
+      })}
+    </nav>
   );
 }
 
@@ -111,10 +159,16 @@ const devanagariReferenceRows: Keycap[][] = [
   ],
 ];
 
-const japaneseKeyboardRows: Keycap[][] = [
+const hiraganaKeyboardRows: Keycap[][] = [
   ['た', 'て', 'い', 'す', 'か', 'ん', 'な', 'に', 'ら', 'せ'],
   ['ち', 'と', 'し', 'は', 'き', 'く', 'ま', 'の', 'り'],
   ['つ', 'さ', 'そ', 'ひ', 'こ', 'み', 'も'],
+];
+
+const katakanaKeyboardRows: Keycap[][] = [
+  ['タ', 'テ', 'イ', 'ス', 'カ', 'ン', 'ナ', 'ニ', 'ラ', 'セ'],
+  ['チ', 'ト', 'シ', 'ハ', 'キ', 'ク', 'マ', 'ノ', 'リ'],
+  ['ツ', 'サ', 'ソ', 'ヒ', 'コ', 'ミ', 'モ'],
 ];
 
 const cherokeeKeyboardRows: Keycap[][] = [
@@ -171,21 +225,23 @@ const copticKeyboardRows: Keycap[][] = [
   ['ϣ', 'ϥ', 'ϧ', 'ϩ', 'ϫ', 'ϭ', 'ϯ'],
 ];
 
+const qaniujaaqpaitNumberRow: Keycap[] = [
+  { main: '', sub: '`' },
+  { main: 'ᖕ', sub: '1' },
+  { main: 'ᑉ', sub: '2' },
+  { main: 'ᕐ', sub: '3' },
+  { main: 'ᒃ', sub: '4' },
+  { main: 'ᑦ', sub: '5' },
+  { main: 'ᖅ', sub: '6' },
+  { main: 'ᒻ', sub: '7' },
+  { main: 'ᓐ', sub: '8' },
+  { main: 'ᓪ', sub: '9' },
+  { main: 'ᔾ', sub: '0' },
+  { main: '', sub: '-' },
+  { main: 'ᒡ', sub: '=' },
+];
+
 const qaniujaaqpaitKeyboardRows: Keycap[][] = [
-  [
-    { main: 'ᖕ', sub: '1' },
-    { main: 'ᑉ', sub: '2' },
-    { main: 'ᕐ', sub: '3' },
-    { main: 'ᒃ', sub: '4' },
-    { main: 'ᑦ', sub: '5' },
-    { main: 'ᖅ', sub: '6' },
-    { main: 'ᒻ', sub: '7' },
-    { main: 'ᓐ', sub: '8' },
-    { main: 'ᓪ', sub: '9' },
-    { main: 'ᔾ', sub: '0' },
-    { main: 'ᒡ', sub: '=' },
-    { main: '˙', sub: ']' },
-  ],
   [
     { main: 'ᖏ', sub: 'q' },
     { main: 'ᐃ', sub: 'w' },
@@ -267,6 +323,34 @@ const maldivianKeyboardRows: Keycap[][] = [
   ['ޒ', 'ޗ', 'ވ', 'ބ', 'ނ', 'މ'],
 ];
 
+const armenianNumberRow: Keycap[] = [
+  { main: '', sub: '`' },
+  { main: '', sub: '1' },
+  { main: 'ձ', sub: '2' },
+  { main: 'յ', sub: '3' },
+  { main: '', sub: '4' },
+  { main: '', sub: '5' },
+  { main: '', sub: '6' },
+  { main: '', sub: '7' },
+  { main: '', sub: '8' },
+  { main: '', sub: '9' },
+  { main: 'օ', sub: '0' },
+  { main: 'ռ', sub: '[' },
+  { main: 'ժ', sub: '/' },
+];
+
+const armenianKeyboardRows: Keycap[][] = [
+  ['խ', 'ւ', 'է', 'ր', 'տ', 'ե', 'ը', 'ի', 'ո', 'պ', 'չ', 'ջ'],
+  ['ա', 'ս', 'դ', 'ֆ', 'ք', 'հ', 'ճ', 'կ', 'լ', 'թ', 'փ'],
+  ['զ', 'ց', 'գ', 'վ', 'բ', 'ն', 'մ', 'շ', 'ղ', 'ծ'],
+];
+
+const georgianKeyboardRows: Keycap[][] = [
+  ['ღ', 'ჯ', 'უ', 'კ', 'ე', 'ნ', 'გ', 'შ', 'წ', 'ზ', 'ხ', 'ც'],
+  ['ფ', 'ძ', 'ვ', 'თ', 'ა', 'პ', 'რ', 'ო', 'ლ', 'დ', 'ჟ'],
+  ['ჭ', 'ჩ', 'ყ', 'ს', 'მ', 'ი', 'ტ', 'ქ', 'ბ', 'ჰ'],
+];
+
 const englishKeyboardRows: Keycap[][] = [
   ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
   ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
@@ -310,11 +394,19 @@ const languageOptions: {
     referenceContent: null,
   },
   {
-    value: 'japanese',
-    label: 'Japanese',
+    value: 'hiragana',
+    label: 'Hiragana',
     flag: '🇯🇵',
     referenceContent: (
-      <KeyboardReferenceCard direction="ltr" lang="ja" rows={japaneseKeyboardRows} />
+      <KeyboardReferenceCard direction="ltr" lang="ja" rows={hiraganaKeyboardRows} />
+    ),
+  },
+  {
+    value: 'katakana',
+    label: 'Katakana',
+    flag: '🎌',
+    referenceContent: (
+      <KeyboardReferenceCard direction="ltr" lang="ja" rows={katakanaKeyboardRows} />
     ),
   },
   {
@@ -349,31 +441,31 @@ const languageOptions: {
         lang="am"
         rows={[
           [
-            { main: 'h', sub: 'ሀ' },
-            { main: 'l', sub: 'ለ' },
-            { main: 'm', sub: 'መ' },
-            { main: 'r', sub: 'ረ' },
-            { main: 's', sub: 'ሰ' },
-            { main: 'b', sub: 'በ' },
-            { main: 't', sub: 'ተ' },
+            { main: 'ሀ', sub: 'h' },
+            { main: 'ለ', sub: 'l' },
+            { main: 'መ', sub: 'm' },
+            { main: 'ረ', sub: 'r' },
+            { main: 'ሰ', sub: 's' },
+            { main: 'በ', sub: 'b' },
+            { main: 'ተ', sub: 't' },
           ],
           [
-            { main: 'n', sub: 'ነ' },
-            { main: 'k', sub: 'ከ' },
-            { main: 'w', sub: 'ወ' },
-            { main: 'z', sub: 'ዘ' },
-            { main: 'y', sub: 'የ' },
-            { main: 'd', sub: 'ደ' },
-            { main: 'g', sub: 'ገ' },
+            { main: 'ነ', sub: 'n' },
+            { main: 'ከ', sub: 'k' },
+            { main: 'ወ', sub: 'w' },
+            { main: 'ዘ', sub: 'z' },
+            { main: 'የ', sub: 'y' },
+            { main: 'ደ', sub: 'd' },
+            { main: 'ገ', sub: 'g' },
           ],
           [
-            { main: 'q', sub: 'ቀ' },
-            { main: 'c', sub: 'ቸ' },
-            { main: 'j', sub: 'ጀ' },
-            { main: 'x', sub: 'ጸ' },
-            { main: 'f', sub: 'ፈ' },
-            { main: 'p', sub: 'ፐ' },
-            { main: 'e/u/i/a/o', sub: 'አ ኡ ኢ ኣ ኦ' },
+            { main: 'ቀ', sub: 'q' },
+            { main: 'ቸ', sub: 'c' },
+            { main: 'ጀ', sub: 'j' },
+            { main: 'ጸ', sub: 'x' },
+            { main: 'ፈ', sub: 'f' },
+            { main: 'ፐ', sub: 'p' },
+            { main: 'አ ኡ ኢ ኣ ኦ', sub: 'e/u/i/a/o' },
           ],
         ]}
       />
@@ -408,7 +500,12 @@ const languageOptions: {
     label: 'Qaniujaaqpait',
     flag: '🇨🇦',
     referenceContent: (
-      <KeyboardReferenceCard direction="ltr" lang="iu" rows={qaniujaaqpaitKeyboardRows} />
+      <KeyboardReferenceCard
+        direction="ltr"
+        lang="iu"
+        numberRow={qaniujaaqpaitNumberRow}
+        rows={qaniujaaqpaitKeyboardRows}
+      />
     ),
   },
   {
@@ -467,11 +564,8 @@ const languageOptions: {
       <KeyboardReferenceCard
         direction="ltr"
         lang="hy"
-        rows={[
-          ['Ա', 'Բ', 'Գ', 'Դ', 'Ե', 'Զ', 'Է'],
-          ['Ը', 'Թ', 'Ժ', 'Ի', 'Լ', 'Խ', 'Ծ'],
-          ['Կ', 'Հ', 'Ձ', 'Ղ', 'Ճ', 'Մ', 'Շ'],
-        ]}
+        numberRow={armenianNumberRow}
+        rows={armenianKeyboardRows}
       />
     ),
   },
@@ -486,15 +580,7 @@ const languageOptions: {
     label: 'Georgian',
     flag: '🇬🇪',
     referenceContent: (
-      <KeyboardReferenceCard
-        direction="ltr"
-        lang="ka"
-        rows={[
-          ['ა', 'ბ', 'გ', 'დ', 'ე', 'ვ', 'ზ'],
-          ['თ', 'ი', 'კ', 'ლ', 'მ', 'ნ', 'ო'],
-          ['პ', 'ჟ', 'რ', 'ს', 'ტ', 'უ', 'ქ'],
-        ]}
-      />
+      <KeyboardReferenceCard direction="ltr" lang="ka" rows={georgianKeyboardRows} />
     ),
   },
   {
@@ -680,63 +766,260 @@ const languageOptions: {
   },
 ];
 
+const getDefaultStats = (tab: TabValue): SidebarStat[] =>
+  tab === 'typing'
+    ? [
+        { label: 'Completed', value: 0 },
+        { label: 'Mistakes', value: 0 },
+        { label: 'Speed', value: '—' },
+        { label: 'Accuracy', value: '—' },
+      ]
+    : [
+        { label: 'Correct', value: 0 },
+        { label: 'Incorrect', value: 0 },
+        { label: 'Accuracy', value: '—' },
+      ];
+
+function DesktopLanguageList({
+  options,
+  value,
+  onChange,
+}: {
+  options: typeof languageOptions;
+  value: StudyLanguage;
+  onChange: (value: StudyLanguage) => void;
+}) {
+  return (
+    <nav
+      className="hidden flex-wrap gap-2 py-4 lg:flex"
+      role="tablist"
+      aria-label="Study languages"
+    >
+      {options.map(option => {
+        const isActive = option.value === value;
+
+        return (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => onChange(option.value)}
+            className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1.5 text-sm leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 ${
+              isActive
+                ? 'border-zinc-950 bg-zinc-950 text-white'
+                : 'border-zinc-200 bg-transparent text-zinc-500 hover:border-zinc-950 hover:text-zinc-950'
+            }`}
+            aria-label={option.label}
+            aria-selected={isActive}
+            role="tab"
+            tabIndex={isActive ? 0 : -1}
+            id={`language-tab-${option.value}`}
+            aria-controls={`language-panel-${option.value}`}
+            title={option.label}
+          >
+            <span className="text-base leading-none" aria-hidden="true">
+              {option.flag}
+            </span>
+            <span className="font-medium">{option.label}</span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+function MobileLanguageGrid({
+  options,
+  value,
+  onChange,
+}: {
+  options: typeof languageOptions;
+  value: StudyLanguage;
+  onChange: (value: StudyLanguage) => void;
+}) {
+  return (
+    <nav className="grid grid-cols-5 sm:grid-cols-6 lg:hidden" role="tablist" aria-label="Study languages">
+      {options.map(option => {
+        const isActive = option.value === value;
+
+        return (
+          <button
+            key={option.value}
+            type="button"
+            className={`-mb-px -mr-px flex aspect-square min-h-[3rem] items-center justify-center border border-[var(--border)] text-2xl leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 ${
+              isActive
+                ? 'border-zinc-950 bg-zinc-950 text-white'
+                : 'bg-transparent text-zinc-500 hover:text-zinc-950'
+            }`}
+            onClick={() => onChange(option.value)}
+            aria-label={option.label}
+            aria-selected={isActive}
+            role="tab"
+            tabIndex={isActive ? 0 : -1}
+            id={`language-tab-${option.value}`}
+            aria-controls={`language-panel-${option.value}`}
+            title={option.label}
+          >
+            <span aria-hidden="true">{option.flag}</span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+function DesktopStatsRail({ stats }: { stats: SidebarStat[] }) {
+  return (
+    <aside className="hidden lg:block">
+      <div className="sticky top-8 space-y-5 pr-6 text-sm">
+        {stats.map(stat => (
+          <div key={stat.label}>
+            <p className="text-zinc-500">{stat.label}</p>
+            <p className="mt-1 text-3xl font-medium leading-none text-zinc-950">{stat.value}</p>
+          </div>
+        ))}
+      </div>
+    </aside>
+  );
+}
+
 function KeyboardReferenceCard({
   direction,
   lang,
+  numberRow,
   rows,
 }: {
   direction: 'ltr' | 'rtl';
   lang: string;
+  numberRow?: Keycap[];
   rows: Keycap[][];
 }) {
+  const onVirtualKeyPress = useVirtualKeyboard();
   const bottomRowKeys =
     lang === 'ar' || lang === 'fa' ? ['Enter', 'Space', 'Shift'] : ['Shift', 'Space', 'Enter'];
+  const mainKeyBaseClassName =
+    'absolute right-1 top-1 text-right transition-colors group-hover:text-white sm:right-1.5 sm:top-1.5';
+  const legendRows =
+    keyboardLegendOverrides[lang] ??
+    rows.map((row, rowIndex) =>
+      defaultLetterLegendRows[Math.min(rowIndex, defaultLetterLegendRows.length - 1)]?.slice(0, row.length) ??
+      row.map(() => ''),
+    );
+  const visibleNumberRow = numberRow ?? defaultNumberRow;
 
   return (
-    <div className="p-4 sm:p-6" dir={direction} lang={lang}>
-      <div className="space-y-3">
-        {rows.map(row => (
+    <div className="px-1.5 py-2.5 sm:p-6" dir={direction} lang={lang}>
+      <div className="space-y-1.5 sm:space-y-3">
+        <div className="flex flex-wrap justify-center gap-1 sm:gap-1.5">
+          {visibleNumberRow.map((keycap, keyIndex) => {
+            const main = typeof keycap === 'string' ? keycap : (keycap.main ?? '');
+            const sub =
+              typeof keycap === 'string'
+                ? usNumberLegendRow[keyIndex] ?? ''
+                : (keycap.sub ?? usNumberLegendRow[keyIndex] ?? '');
+            const insertValue = main || sub;
+            const mainKeyClassName =
+              main.length > 4
+                ? `${mainKeyBaseClassName} text-[0.48rem] font-semibold leading-tight sm:text-[0.72rem]`
+                : main.length > 2
+                  ? `${mainKeyBaseClassName} text-[0.62rem] font-medium leading-none sm:text-base`
+                  : `${mainKeyBaseClassName} text-[0.95rem] font-medium leading-none sm:text-xl`;
+
+            return (
+              <button
+                key={`${lang}-number-${keyIndex}`}
+                type="button"
+                onMouseDown={event => event.preventDefault()}
+                onClick={() => {
+                  if (insertValue) {
+                    onVirtualKeyPress?.(insertValue);
+                  }
+                }}
+                className="group relative flex h-8 min-w-[1.35rem] items-stretch overflow-hidden rounded-lg border border-[var(--border)] px-1 py-0.5 text-zinc-950 transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:h-12 sm:min-w-[3.2rem] sm:rounded-xl sm:px-2 sm:py-1"
+                aria-label={`${lang} key ${insertValue}`}
+              >
+                {main ? (
+                  <span className={mainKeyClassName}>
+                    {main}
+                  </span>
+                ) : null}
+                {sub ? (
+                  <span className="absolute bottom-0.5 left-1 text-[0.42rem] leading-none text-zinc-500 transition-colors group-hover:text-white sm:bottom-1 sm:left-1.5 sm:text-[0.62rem]">
+                    {sub}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+
+        {legendRows.map((legendRow, rowIndex) => (
           <div
-            key={row.map(keycap => (typeof keycap === 'string' ? keycap : keycap.main)).join('|')}
-            className="flex flex-wrap justify-center gap-1.5"
+            key={`${lang}-${rowIndex}`}
+            className="flex flex-wrap justify-center gap-1 sm:gap-1.5"
           >
-            {row.map(keycap => {
-              const main = typeof keycap === 'string' ? keycap : keycap.main;
-              const sub = typeof keycap === 'string' ? null : keycap.sub;
-              const mainClassName =
+            {legendRow.map((legend, keyIndex) => {
+              const keycap = rows[rowIndex]?.[keyIndex];
+              const main = typeof keycap === 'string' ? keycap : (keycap?.main ?? '');
+              const sub =
+                typeof keycap === 'string' ? legend : (keycap?.sub ?? legend ?? null);
+              const hasMain = main.length > 0;
+              const insertValue = main || sub || '';
+              const mainKeyClassName =
                 main.length > 4
-                  ? 'text-[0.72rem] font-semibold leading-tight sm:text-sm'
+                  ? `${mainKeyBaseClassName} text-[0.48rem] font-semibold leading-tight sm:text-[0.72rem]`
                   : main.length > 2
-                    ? 'text-base font-medium leading-none sm:text-lg'
-                    : 'text-xl font-medium leading-none sm:text-2xl';
+                    ? `${mainKeyBaseClassName} text-[0.62rem] font-medium leading-none sm:text-base`
+                    : `${mainKeyBaseClassName} text-[0.95rem] font-medium leading-none sm:text-xl`;
 
               return (
-                <div
-                  key={`${main}-${sub ?? ''}`}
-                  className="flex h-11 min-w-[2.9rem] flex-col items-center justify-center border border-[var(--border)] px-2 text-zinc-950 sm:h-12 sm:min-w-[3.2rem]"
+                <button
+                  key={`${lang}-${rowIndex}-${keyIndex}`}
+                  type="button"
+                  onMouseDown={event => event.preventDefault()}
+                  onClick={() => {
+                    if (insertValue) {
+                      onVirtualKeyPress?.(insertValue);
+                    }
+                  }}
+                  className="group relative flex h-8 min-w-[1.35rem] items-stretch overflow-hidden rounded-lg border border-[var(--border)] px-1 py-0.5 text-zinc-950 transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:h-12 sm:min-w-[3.2rem] sm:rounded-xl sm:px-2 sm:py-1"
+                  aria-label={`${lang} key ${insertValue}`}
                 >
-                  <span className={mainClassName}>{main}</span>
+                  {hasMain ? (
+                    <span className={mainKeyClassName}>
+                      {main}
+                    </span>
+                  ) : null}
                   {sub ? (
-                    <span className="mt-0.5 text-[0.56rem] leading-none text-zinc-500 sm:text-[0.62rem]">
+                    <span className="absolute bottom-0.5 left-1 text-[0.42rem] leading-none text-zinc-500 transition-colors group-hover:text-white sm:bottom-1 sm:left-1.5 sm:text-[0.62rem]">
                       {sub}
                     </span>
                   ) : null}
-                </div>
+                </button>
               );
             })}
           </div>
         ))}
 
-        <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1.5">
+        <div className="flex flex-wrap items-center justify-center gap-1 pt-1 sm:gap-1.5 sm:pt-1.5">
           {bottomRowKeys.map(key => (
-            <div
+            <button
               key={key}
-              className={`flex h-10 items-center justify-center border border-[var(--border)] text-[0.65rem] uppercase tracking-[0.18em] text-zinc-500 ${
-                key === 'Space' ? 'min-w-[9rem] px-4 sm:min-w-[14rem]' : 'w-20'
+              type="button"
+              onMouseDown={event => event.preventDefault()}
+              onClick={() => {
+                if (key === 'Space') {
+                  onVirtualKeyPress?.(' ');
+                }
+              }}
+              className={`flex h-7 items-center justify-center rounded-lg border border-[var(--border)] text-[0.46rem] uppercase tracking-[0.16em] text-zinc-500 sm:h-10 sm:rounded-xl sm:text-[0.65rem] sm:tracking-[0.18em] ${
+                key === 'Space'
+                  ? 'min-w-[6rem] px-3 sm:min-w-[14rem] sm:px-4'
+                  : 'w-12 sm:w-20'
               }`}
+              aria-label={key}
             >
               {key}
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -747,9 +1030,23 @@ function KeyboardReferenceCard({
 export default function LanguageWorkspace() {
   const [activeLanguage, setActiveLanguage] = useState<StudyLanguage>('arabic');
   const [activeTab, setActiveTab] = useState<TabValue>('typing');
+  const [desktopStats, setDesktopStats] = useState<SidebarStat[]>(getDefaultStats('typing'));
+  const [virtualKeyHandler, setVirtualKeyHandler] = useState<((key: string) => void) | null>(null);
   const activeOption =
     languageOptions.find(option => option.value === activeLanguage) ?? languageOptions[0];
   const activeTabs = tabsByLanguage[activeLanguage];
+
+  const handleLanguageChange = (language: StudyLanguage) => {
+    setActiveLanguage(language);
+    setActiveTab('typing');
+  };
+
+  const handleVirtualKeyHandlerChange = (
+    handler: ((key: string) => void) | null,
+  ) => {
+    // Store function values directly instead of letting React treat them as updater callbacks.
+    setVirtualKeyHandler(() => handler);
+  };
 
   useEffect(() => {
     if (!activeTabs.some(tab => tab.value === activeTab)) {
@@ -757,74 +1054,64 @@ export default function LanguageWorkspace() {
     }
   }, [activeTab, activeTabs]);
 
+  useEffect(() => {
+    setDesktopStats(getDefaultStats(activeTab));
+  }, [activeLanguage, activeTab]);
+
   return (
-    <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-10">
-      <aside className="border-b border-[var(--border)] pb-6 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-8">
-        <div className="flex flex-col gap-6 lg:sticky lg:top-8">
-          <AppLogo
+    <VirtualKeyboardContext.Provider value={virtualKeyHandler}>
+      <div className="flex flex-col gap-8 lg:gap-10">
+      <header className="flex flex-col gap-4 pb-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <BrandMark />
+
+          <PracticeModeSwitch
             activeLanguage={activeLanguage}
             activeTab={activeTab}
             activeTabs={activeTabs}
             onTabChange={setActiveTab}
           />
-
-          <nav
-            className="grid grid-cols-5 sm:grid-cols-6 lg:grid-cols-1"
-            role="tablist"
-            aria-label="Study languages"
-          >
-          {languageOptions.map(option => {
-            const isActive = option.value === activeLanguage;
-
-            return (
-              <button
-                key={option.value}
-                type="button"
-                className={`-mb-px -mr-px flex aspect-square min-h-[3rem] items-center justify-center border border-[var(--border)] text-2xl leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 lg:mr-0 lg:w-full lg:aspect-auto lg:min-h-[3.25rem] lg:justify-start lg:gap-3 lg:px-4 lg:text-left ${
-                  isActive
-                    ? 'border-zinc-950 bg-zinc-950 text-white'
-                    : 'bg-transparent text-zinc-500 hover:text-zinc-950'
-                }`}
-                onClick={() => {
-                  setActiveLanguage(option.value);
-                  setActiveTab('typing');
-                }}
-                aria-label={option.label}
-                aria-selected={isActive}
-                role="tab"
-                tabIndex={isActive ? 0 : -1}
-                id={`language-tab-${option.value}`}
-                aria-controls={`language-panel-${option.value}`}
-                title={option.label}
-              >
-                <span aria-hidden="true">{option.flag}</span>
-                <span className="hidden text-sm font-medium leading-none lg:inline">
-                  {option.label}
-                </span>
-              </button>
-            );
-          })}
-          </nav>
-
         </div>
-      </aside>
 
-      <div
-        role="tabpanel"
-        id={`language-panel-${activeLanguage}`}
-        aria-labelledby={`language-tab-${activeLanguage}`}
-        className="min-w-0"
-      >
-        <section className="flex flex-col gap-10">
-          <TrainerTabs language={activeLanguage} activeTab={activeTab} />
+        <DesktopLanguageList
+          options={languageOptions}
+          value={activeLanguage}
+          onChange={handleLanguageChange}
+        />
 
-          {activeTab === 'typing' && activeOption.referenceContent ? (
-            <section className="border-t border-[var(--border)] pt-10">
-              {activeOption.referenceContent}
-            </section>
-          ) : null}
-        </section>
+        <MobileLanguageGrid
+          options={languageOptions}
+          value={activeLanguage}
+          onChange={handleLanguageChange}
+        />
+      </header>
+
+      <div className="lg:grid lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-8">
+        <DesktopStatsRail stats={desktopStats} />
+
+        <div
+          role="tabpanel"
+          id={`language-panel-${activeLanguage}`}
+          aria-labelledby={`language-tab-${activeLanguage}`}
+          className="min-w-0"
+        >
+          <section className="flex flex-col gap-5 sm:gap-6">
+            <TrainerTabs
+              language={activeLanguage}
+              activeTab={activeTab}
+              onStatsChange={setDesktopStats}
+              onVirtualKeyHandlerChange={handleVirtualKeyHandlerChange}
+            />
+
+            {activeTab === 'typing' && activeOption.referenceContent ? (
+              <section className="pt-1 sm:pt-2">
+                {activeOption.referenceContent}
+              </section>
+            ) : null}
+          </section>
+        </div>
       </div>
-    </div>
+      </div>
+    </VirtualKeyboardContext.Provider>
   );
 }

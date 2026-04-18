@@ -1,10 +1,11 @@
 'use client';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import { cherokeePracticePrompts } from '../data/cherokee';
 import { copticPracticePrompts } from '../data/coptic';
 import { emojiPracticePrompts } from '../data/emoji';
 import { javanesePracticePrompts } from '../data/javanese';
+import { hiraganaPracticePrompts, katakanaPracticePrompts } from '../data/japaneseKana';
 import { maldivianPracticePrompts } from '../data/maldivian';
 import { osagePracticePrompts } from '../data/osage';
 import { qaniujaaqpaitPracticePrompts } from '../data/qaniujaaqpait';
@@ -16,7 +17,6 @@ type TypingLanguage =
       | 'english'
       | 'hebrew'
       | 'chinese'
-      | 'japanese'
       | 'korean'
       | 'russian'
       | 'ethiopian'
@@ -40,7 +40,9 @@ type TypingLanguage =
   | 'coptic'
   | 'qaniujaaqpait'
   | 'javanese'
-  | 'maldivian';
+  | 'maldivian'
+  | 'hiragana'
+  | 'katakana';
 
 const segmentText = (text: string) => {
   if (typeof Intl !== 'undefined' && 'Segmenter' in Intl) {
@@ -74,8 +76,13 @@ const typingLanguageConfig: Record<
     direction: 'ltr',
     htmlLang: 'zh-Hans',
   },
-  japanese: {
-    label: 'Japanese',
+  hiragana: {
+    label: 'Hiragana',
+    direction: 'ltr',
+    htmlLang: 'ja',
+  },
+  katakana: {
+    label: 'Katakana',
     direction: 'ltr',
     htmlLang: 'ja',
   },
@@ -207,6 +214,21 @@ const normalizePromptForTyping = (language: TypingLanguage, prompt: string) => {
 const pickRandomPrompt = <T,>(prompts: readonly T[]) =>
   prompts[Math.floor(Math.random() * prompts.length)];
 
+function RefreshIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="h-4 w-4 fill-none stroke-current stroke-[1.9]"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 12a9 9 0 1 1-3.15-6.86" />
+      <path d="M21 3v6h-6" />
+    </svg>
+  );
+}
+
 const createPrompt = (language: TypingLanguage) => {
   if (language === 'cherokee') {
     return pickRandomPrompt(cherokeePracticePrompts);
@@ -228,6 +250,14 @@ const createPrompt = (language: TypingLanguage) => {
     return pickRandomPrompt(qaniujaaqpaitPracticePrompts);
   }
 
+  if (language === 'hiragana') {
+    return pickRandomPrompt(hiraganaPracticePrompts);
+  }
+
+  if (language === 'katakana') {
+    return pickRandomPrompt(katakanaPracticePrompts);
+  }
+
   if (language === 'javanese') {
     return pickRandomPrompt(javanesePracticePrompts);
   }
@@ -239,8 +269,17 @@ const createPrompt = (language: TypingLanguage) => {
   return normalizePromptForTyping(language, randomSentence(language));
 };
 
-export default function TypingTrainer({ language }: { language: TypingLanguage }) {
+export default function TypingTrainer({
+  language,
+  onStatsChange,
+  onVirtualKeyHandlerChange,
+}: {
+  language: TypingLanguage;
+  onStatsChange?: (stats: { label: string; value: string | number }[]) => void;
+  onVirtualKeyHandlerChange?: (handler: ((key: string) => void) | null) => void;
+}) {
   const languageConfig = typingLanguageConfig[language];
+  const inputRef = useRef<HTMLInputElement>(null);
   const [promptKey, setPromptKey] = useState(0);
   const [prompt, setPrompt] = useState(() => createPrompt(language));
   const [input, setInput] = useState('');
@@ -265,12 +304,20 @@ export default function TypingTrainer({ language }: { language: TypingLanguage }
     setLastAccuracy(null);
   }, [language]);
 
+  useEffect(() => {
+    onStatsChange?.([
+      { label: 'Completed', value: completedPrompts },
+      { label: 'Mistakes', value: mistakes },
+      { label: 'Speed', value: lastSpeed ? `${lastSpeed.toFixed(1)}/s` : '—' },
+      { label: 'Accuracy', value: lastAccuracy !== null ? `${Math.round(lastAccuracy)}%` : '—' },
+    ]);
+  }, [completedPrompts, lastAccuracy, lastSpeed, mistakes, onStatsChange]);
+
   const moveToNextPrompt = () => {
     setPromptKey(current => current + 1);
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const nextValue = event.target.value;
+  const applyInputValue = (nextValue: string) => {
     const nextUnits = segmentText(nextValue);
 
     if (startTime === null && nextUnits.length > 0) {
@@ -293,6 +340,37 @@ export default function TypingTrainer({ language }: { language: TypingLanguage }
 
     setInput(nextValue);
   };
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    applyInputValue(event.target.value);
+  };
+
+  useEffect(() => {
+    const handleVirtualKeyPress = (key: string | null | undefined) => {
+      if (!key) {
+        return;
+      }
+
+      const inputElement = inputRef.current;
+      const selectionStart = inputElement?.selectionStart ?? input.length;
+      const selectionEnd = inputElement?.selectionEnd ?? input.length;
+      const nextValue = `${input.slice(0, selectionStart)}${key}${input.slice(selectionEnd)}`;
+      const nextCursorPosition = selectionStart + key.length;
+
+      applyInputValue(nextValue);
+
+      window.requestAnimationFrame(() => {
+        inputRef.current?.focus();
+        inputRef.current?.setSelectionRange(nextCursorPosition, nextCursorPosition);
+      });
+    };
+
+    onVirtualKeyHandlerChange?.(handleVirtualKeyPress);
+
+    return () => {
+      onVirtualKeyHandlerChange?.(null);
+    };
+  }, [input, onVirtualKeyHandlerChange, startTime, inputUnits.length, promptUnits]);
 
   useEffect(() => {
     if (input !== prompt || !startTime) {
@@ -326,16 +404,28 @@ export default function TypingTrainer({ language }: { language: TypingLanguage }
   };
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem]">
-      <section className="p-6 sm:p-8">
-        <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6">
+      <section className="p-4 sm:p-6">
+        <div className="flex flex-col gap-4">
           <div
             dir={languageConfig.direction}
             lang={languageConfig.htmlLang}
-            className={`min-h-[7rem] border border-[var(--border)] p-6 text-2xl leading-loose tracking-[0.03em] text-zinc-950 sm:text-3xl ${
+            className={`relative min-h-[6.5rem] px-5 pb-5 pt-11 text-[1.65rem] leading-loose tracking-[0.03em] text-zinc-950 sm:px-6 sm:pb-6 sm:pt-12 sm:text-3xl ${
               languageConfig.direction === 'rtl' ? 'text-right' : 'text-left'
             }`}
           >
+            <button
+              type="button"
+              onClick={moveToNextPrompt}
+              className={`absolute top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-500 transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 ${
+                languageConfig.direction === 'rtl' ? 'left-3' : 'right-3'
+              }`}
+              aria-label="Load a new prompt"
+              title="New prompt"
+            >
+              <RefreshIcon />
+            </button>
+
             {promptUnits.map((char, idx) => (
               <span key={idx} className={getCharClass(char, idx)}>
                 {char}
@@ -345,6 +435,7 @@ export default function TypingTrainer({ language }: { language: TypingLanguage }
 
           <label>
             <input
+              ref={inputRef}
               type="text"
               dir={languageConfig.direction}
               lang={languageConfig.htmlLang}
@@ -354,27 +445,17 @@ export default function TypingTrainer({ language }: { language: TypingLanguage }
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck={false}
-              className={`w-full border border-[var(--border)] bg-transparent px-4 py-4 text-xl text-zinc-950 outline-none transition focus:border-zinc-950 ${
+              className={`w-full rounded-2xl bg-zinc-100 px-4 py-3.5 text-xl text-zinc-950 outline-none transition focus:bg-zinc-200 sm:py-4 ${
                 languageConfig.direction === 'rtl' ? 'text-right' : 'text-left'
               }`}
               aria-label={`Type the ${languageConfig.label} prompt`}
             />
           </label>
-
-          <div className="flex justify-end border-t border-[var(--border)] pt-4">
-            <button
-              type="button"
-              onClick={moveToNextPrompt}
-              className="inline-flex items-center justify-center border border-zinc-950 px-4 py-2 text-sm font-medium text-zinc-950 transition hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
-            >
-              New prompt
-            </button>
-          </div>
         </div>
       </section>
 
-      <aside className="border-t border-[var(--border)] p-5 lg:border-l lg:border-t-0 lg:pl-6">
-        <div className="space-y-5 text-sm">
+      <aside className="border-t border-[var(--border)] p-4 lg:hidden">
+        <div className="space-y-4 text-sm">
           <div>
             <p className="text-zinc-500">Completed</p>
             <p className="mt-1 text-2xl font-medium text-zinc-950">{completedPrompts}</p>

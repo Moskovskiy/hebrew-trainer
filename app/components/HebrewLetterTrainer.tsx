@@ -6,12 +6,17 @@ const hebrewSoundEntries = hebrewLetters.map(letter => ({
   sounds: letter.sounds,
 }));
 
-export default function HebrewLetterTrainer() {
+export default function HebrewLetterTrainer({
+  onStatsChange,
+}: {
+  onStatsChange?: (stats: { label: string; value: string | number }[]) => void;
+}) {
   return (
     <SoundTrainer
       entries={hebrewSoundEntries}
       promptLabel="Hebrew letter"
       instructionText="Choose the sound that matches the letter. The next card appears automatically."
+      onStatsChange={onStatsChange}
     />
   );
 }
