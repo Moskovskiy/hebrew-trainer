@@ -21,6 +21,8 @@ body {
     var(--font-sans-arabic), var(--font-sans-myanmar), var(--font-sans-ethiopic),
     var(--font-sans-chinese), var(--font-sans-japanese), var(--font-sans-thai),
     var(--font-sans-armenian), var(--font-sans-georgian), var(--font-sans-gujarati),
+    var(--font-sans-javanese), var(--font-sans-cherokee), var(--font-sans-qaniujaaqpait),
+    var(--font-sans-coptic), var(--font-sans-osage), var(--font-sans-maldivian),
     var(--font-sans-devanagari), var(--font-sans-khmer), var(--font-serif-tibetan),
     var(--font-sans-urdu), ui-sans-serif, system-ui, sans-serif;
   background-color: var(--page-background);

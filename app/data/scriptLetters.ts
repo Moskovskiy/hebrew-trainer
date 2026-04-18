@@ -3,6 +3,35 @@ export interface ScriptLetter {
   sounds: string[];
 }
 
+export const englishLetters: ScriptLetter[] = [
+  { symbol: 'A', sounds: ['A'] },
+  { symbol: 'B', sounds: ['B'] },
+  { symbol: 'C', sounds: ['C'] },
+  { symbol: 'D', sounds: ['D'] },
+  { symbol: 'E', sounds: ['E'] },
+  { symbol: 'F', sounds: ['F'] },
+  { symbol: 'G', sounds: ['G'] },
+  { symbol: 'H', sounds: ['H'] },
+  { symbol: 'I', sounds: ['I'] },
+  { symbol: 'J', sounds: ['J'] },
+  { symbol: 'K', sounds: ['K'] },
+  { symbol: 'L', sounds: ['L'] },
+  { symbol: 'M', sounds: ['M'] },
+  { symbol: 'N', sounds: ['N'] },
+  { symbol: 'O', sounds: ['O'] },
+  { symbol: 'P', sounds: ['P'] },
+  { symbol: 'Q', sounds: ['Q'] },
+  { symbol: 'R', sounds: ['R'] },
+  { symbol: 'S', sounds: ['S'] },
+  { symbol: 'T', sounds: ['T'] },
+  { symbol: 'U', sounds: ['U'] },
+  { symbol: 'V', sounds: ['V'] },
+  { symbol: 'W', sounds: ['W'] },
+  { symbol: 'X', sounds: ['X'] },
+  { symbol: 'Y', sounds: ['Y'] },
+  { symbol: 'Z', sounds: ['Z'] },
+];
+
 export const russianLetters: ScriptLetter[] = [
   { symbol: 'А', sounds: ['A'] },
   { symbol: 'Б', sounds: ['B'] },

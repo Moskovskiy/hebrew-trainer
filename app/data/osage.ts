@@ -1,0 +1,58 @@
+export interface OsageEntry {
+  symbol: string;
+  sounds: string[];
+}
+
+export const osagePracticePrompts = [
+  '𐒰 𐒱 𐒲 𐒳 𐒷 𐒸 𐒻 𐓂 𐓃 𐓎',
+  '𐒴 𐒵 𐒶 𐒹 𐒺 𐒼 𐒽 𐒾 𐒿',
+  '𐓀 𐓁 𐓄 𐓅 𐓆 𐓇 𐓈 𐓉 𐓊',
+  '𐓋 𐓌 𐓍 𐓏 𐓐 𐓑 𐓒 𐓓',
+  '𐒾 𐓏 𐒷 𐓊 𐓍 𐓓 𐓎 𐒻 𐓂 𐓄',
+  '𐒰 𐓆 𐓈 𐓉 𐒼 𐒹 𐒽 𐒿 𐓋 𐓌',
+  '𐓒 𐓐 𐒵 𐓇 𐒴 𐓁 𐓀 𐓑 𐓃',
+  '𐒸 𐒶 𐒺 𐒳',
+  '𐒰 𐒷 𐒻 𐓂 𐓎 𐓏 𐓀 𐓁',
+  '𐓄 𐓆 𐓈 𐓊 𐓌 𐓐 𐓒',
+  '𐒴 𐒵 𐒼 𐒽 𐒾 𐒿 𐒹 𐒺',
+  '𐓍 𐓉 𐓋 𐓅 𐒱 𐒲',
+] as const;
+
+export const osageLetters: OsageEntry[] = [
+  { symbol: '𐒰', sounds: ['A'] },
+  { symbol: '𐒱', sounds: ['Ai'] },
+  { symbol: '𐒲', sounds: ['Ain'] },
+  { symbol: '𐒳', sounds: ['Ah'] },
+  { symbol: '𐒴', sounds: ['Bra'] },
+  { symbol: '𐒵', sounds: ['Cha'] },
+  { symbol: '𐒶', sounds: ['Ehcha'] },
+  { symbol: '𐒷', sounds: ['E'] },
+  { symbol: '𐒸', sounds: ['Ein'] },
+  { symbol: '𐒹', sounds: ['Ha'] },
+  { symbol: '𐒺', sounds: ['Hya'] },
+  { symbol: '𐒻', sounds: ['I'] },
+  { symbol: '𐒼', sounds: ['Ka'] },
+  { symbol: '𐒽', sounds: ['Ehka'] },
+  { symbol: '𐒾', sounds: ['Kya'] },
+  { symbol: '𐒿', sounds: ['La'] },
+  { symbol: '𐓀', sounds: ['Ma'] },
+  { symbol: '𐓁', sounds: ['Na'] },
+  { symbol: '𐓂', sounds: ['O'] },
+  { symbol: '𐓃', sounds: ['Oin'] },
+  { symbol: '𐓄', sounds: ['Pa'] },
+  { symbol: '𐓅', sounds: ['Ehpa'] },
+  { symbol: '𐓆', sounds: ['Sa'] },
+  { symbol: '𐓇', sounds: ['Sha'] },
+  { symbol: '𐓈', sounds: ['Ta'] },
+  { symbol: '𐓉', sounds: ['Ehta'] },
+  { symbol: '𐓊', sounds: ['Tsa'] },
+  { symbol: '𐓋', sounds: ['Ehtsa'] },
+  { symbol: '𐓌', sounds: ['Tsha'] },
+  { symbol: '𐓍', sounds: ['Dha'] },
+  { symbol: '𐓎', sounds: ['U'] },
+  { symbol: '𐓏', sounds: ['Wa'] },
+  { symbol: '𐓐', sounds: ['Kha'] },
+  { symbol: '𐓑', sounds: ['Gha'] },
+  { symbol: '𐓒', sounds: ['Za'] },
+  { symbol: '𐓓', sounds: ['Zha'] },
+];

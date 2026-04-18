@@ -8,59 +8,75 @@ import KoreanKeyboardLayout from './KoreanKeyboardLayout';
 
 type Keycap = string | { main: string; sub?: string };
 
-function KeyboardIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-none stroke-current stroke-[1.8]">
-      <rect x="3.5" y="6" width="17" height="12" rx="2.5" />
-      <path d="M7 10h.01M10 10h.01M13 10h.01M16 10h.01M7 13h.01M10 13h.01M13 13h4" />
-    </svg>
-  );
-}
+const tabLabels: Record<TabValue, string> = {
+  typing: 'Type',
+  letters: 'Letters',
+  words: 'Words',
+};
 
-function SoundIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-none stroke-current stroke-[1.8]">
-      <path d="M5 10.5v3h3l4 3.5v-10L8 10.5H5Z" />
-      <path d="M16 9.5a4 4 0 0 1 0 5" />
-      <path d="M18.5 7a7.5 7.5 0 0 1 0 10" />
-    </svg>
-  );
-}
-
-function WordsIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-none stroke-current stroke-[1.8]">
-      <rect x="4" y="5" width="16" height="14" rx="2.5" />
-      <path d="M8 9.5h8M8 12.5h8M8 15.5h5" />
-    </svg>
-  );
-}
-
-function AppLogo() {
-  const glyphs = ['א', 'あ', 'ع', '가'];
+function AppLogo({
+  activeLanguage,
+  activeTab,
+  activeTabs,
+  onTabChange,
+}: {
+  activeLanguage: StudyLanguage;
+  activeTab: TabValue;
+  activeTabs: { value: TabValue; label: string; description: string }[];
+  onTabChange: (value: TabValue) => void;
+}) {
+  const glyphs = ['ა', 'あ', 'ع', '가'];
 
   return (
-    <div className="flex items-center gap-4 pb-1">
-      <div className="grid h-14 w-14 grid-cols-2 overflow-hidden border border-zinc-950">
-        {glyphs.map((glyph, index) => {
-          const isDark = index === 0 || index === 3;
+    <div className="pb-1">
+      <div className="flex items-center gap-4">
+        <div className="grid h-14 w-14 grid-cols-2 overflow-hidden border border-zinc-950">
+          {glyphs.map((glyph, index) => {
+            const isDark = index === 0 || index === 3;
 
-          return (
-            <div
-              key={glyph}
-              className={`flex items-center justify-center text-base font-medium leading-none ${
-                isDark ? 'bg-zinc-950 text-white' : 'bg-transparent text-zinc-950'
-              } ${index < 2 ? 'border-b' : ''} ${index % 2 === 0 ? 'border-r' : ''} border-zinc-950`}
-            >
-              {glyph}
-            </div>
-          );
-        })}
-      </div>
+            return (
+              <div
+                key={glyph}
+                className={`flex items-center justify-center text-base font-medium leading-none ${
+                  isDark ? 'bg-zinc-950 text-white' : 'bg-transparent text-zinc-950'
+                } ${index < 2 ? 'border-b' : ''} ${index % 2 === 0 ? 'border-r' : ''} border-zinc-950`}
+              >
+                {glyph}
+              </div>
+            );
+          })}
+        </div>
 
-      <div className="min-w-0">
-        <p className="text-[0.68rem] uppercase tracking-[0.28em] text-zinc-500">Script Trainer</p>
-        <p className="mt-1 text-base font-medium text-zinc-950">Type Across Scripts</p>
+        <nav
+          className="flex min-w-0 flex-1 items-center rounded-full border border-[var(--border)] p-1"
+          role="tablist"
+          aria-label={`${activeLanguage} trainer exercises`}
+        >
+          {activeTabs.map(tab => {
+            const isActive = tab.value === activeTab;
+
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                className={`flex h-10 min-w-0 flex-1 items-center justify-center rounded-full px-3 text-[0.62rem] font-medium uppercase tracking-[0.12em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:text-[0.68rem] ${
+                  isActive
+                    ? 'bg-zinc-950 text-white'
+                    : 'bg-transparent text-zinc-500 hover:text-zinc-950'
+                }`}
+                onClick={() => onTabChange(tab.value)}
+                aria-selected={isActive}
+                role="tab"
+                tabIndex={isActive ? 0 : -1}
+                id={`trainer-tab-${activeLanguage}-${tab.value}`}
+                aria-controls={`trainer-tabpanel-${activeLanguage}-${tab.value}`}
+                title={tab.label}
+              >
+                <span className="truncate">{tabLabels[tab.value]}</span>
+              </button>
+            );
+          })}
+        </nav>
       </div>
     </div>
   );
@@ -95,82 +111,182 @@ const devanagariReferenceRows: Keycap[][] = [
   ],
 ];
 
-const chineseKeyboardRows: Keycap[][] = [
+const japaneseKeyboardRows: Keycap[][] = [
+  ['た', 'て', 'い', 'す', 'か', 'ん', 'な', 'に', 'ら', 'せ'],
+  ['ち', 'と', 'し', 'は', 'き', 'く', 'ま', 'の', 'り'],
+  ['つ', 'さ', 'そ', 'ひ', 'こ', 'み', 'も'],
+];
+
+const cherokeeKeyboardRows: Keycap[][] = [
   [
-    { main: 'q' },
-    { main: 'w' },
-    { main: 'e' },
-    { main: 'r' },
-    { main: 't' },
-    { main: 'y' },
-    { main: 'u' },
-    { main: 'i' },
-    { main: 'o' },
-    { main: 'p' },
+    'Ꭺ',
+    'Ꮃ',
+    'Ꭱ',
+    'Ꮫ',
+    'Ꮤ',
+    'Ꮿ',
+    'Ꭴ',
+    'Ꭲ',
+    'Ꭳ',
+    'Ꮑ',
+    'Ꮥ',
+    'Ꮆ',
+    'Ꮹ',
   ],
   [
-    { main: 'a' },
-    { main: 's' },
-    { main: 'd' },
-    { main: 'f' },
-    { main: 'g' },
-    { main: 'h' },
-    { main: 'j' },
-    { main: 'k' },
-    { main: 'l' },
+    'Ꭰ',
+    'Ꮝ',
+    'Ꮧ',
+    'Ꭹ',
+    'Ꭶ',
+    'Ꭿ',
+    'Ꮪ',
+    'Ꮈ',
+    'Ꮅ',
+    'Ꮸ',
   ],
   [
-    { main: 'z' },
-    { main: 'x' },
-    { main: 'c' },
-    { main: 'v', sub: 'u:' },
-    { main: 'b' },
-    { main: 'n' },
-    { main: 'm' },
+    'Ꭼ',
+    'Ᏼ',
+    'Ꮣ',
+    'Ꭵ',
+    'Ꭸ',
+    'Ꮎ',
+    'Ꮕ',
+    'Ꮒ',
   ],
 ];
 
-const japaneseKeyboardRows: Keycap[][] = [
+const osageKeyboardRows: Keycap[][] = [
+  ['𐒾', '𐓏', '𐒷', '𐓊', '𐓍', '𐓓', '𐓎', '𐒻', '𐓂', '𐓄', '𐓅', '𐒱', '𐒲'],
+  ['𐒰', '𐓆', '𐓈', '𐓉', '𐒼', '𐒹', '𐒽', '𐒿', '𐓋', '𐓌'],
+  ['𐓒', '𐓐', '𐒵', '𐓇', '𐒴', '𐓁', '𐓀', '𐓑', '𐓃'],
+  ['𐒸', '𐒶', '𐒺', '𐒳'],
+];
+
+const copticKeyboardRows: Keycap[][] = [
+  ['ⲁ', 'ⲃ', 'ⲅ', 'ⲇ', 'ⲉ', 'ⲍ', 'ⲏ', 'ⲑ'],
+  ['ⲓ', 'ⲕ', 'ⲗ', 'ⲙ', 'ⲛ', 'ⲝ', 'ⲟ', 'ⲡ'],
+  ['ⲣ', 'ⲥ', 'ⲧ', 'ⲩ', 'ⲫ', 'ⲭ', 'ⲯ', 'ⲱ'],
+  ['ϣ', 'ϥ', 'ϧ', 'ϩ', 'ϫ', 'ϭ', 'ϯ'],
+];
+
+const qaniujaaqpaitKeyboardRows: Keycap[][] = [
   [
-    { main: 'q', sub: 'た' },
-    { main: 'w', sub: 'て' },
-    { main: 'e', sub: 'い' },
-    { main: 'r', sub: 'す' },
-    { main: 't', sub: 'か' },
-    { main: 'y', sub: 'ん' },
-    { main: 'u', sub: 'な' },
-    { main: 'i', sub: 'に' },
-    { main: 'o', sub: 'ら' },
-    { main: 'p', sub: 'せ' },
+    { main: 'ᖕ', sub: '1' },
+    { main: 'ᑉ', sub: '2' },
+    { main: 'ᕐ', sub: '3' },
+    { main: 'ᒃ', sub: '4' },
+    { main: 'ᑦ', sub: '5' },
+    { main: 'ᖅ', sub: '6' },
+    { main: 'ᒻ', sub: '7' },
+    { main: 'ᓐ', sub: '8' },
+    { main: 'ᓪ', sub: '9' },
+    { main: 'ᔾ', sub: '0' },
+    { main: 'ᒡ', sub: '=' },
+    { main: '˙', sub: ']' },
   ],
   [
-    { main: 'a', sub: 'ち' },
-    { main: 's', sub: 'と' },
-    { main: 'd', sub: 'し' },
-    { main: 'f', sub: 'は' },
-    { main: 'g', sub: 'き' },
-    { main: 'h', sub: 'く' },
-    { main: 'j', sub: 'ま' },
-    { main: 'k', sub: 'の' },
-    { main: 'l', sub: 'り' },
+    { main: 'ᖏ', sub: 'q' },
+    { main: 'ᐃ', sub: 'w' },
+    { main: 'ᕿ', sub: 'e' },
+    { main: 'ᑭ', sub: 'r' },
+    { main: 'ᑎ', sub: 't' },
+    { main: 'ᓯ', sub: 'y' },
+    { main: 'ᒥ', sub: 'u' },
+    { main: 'ᓂ', sub: 'i' },
+    { main: 'ᓕ', sub: 'o' },
+    { main: 'ᔨ', sub: 'p' },
   ],
   [
-    { main: 'z', sub: 'つ' },
-    { main: 'x', sub: 'さ' },
-    { main: 'c', sub: 'そ' },
-    { main: 'v', sub: 'ひ' },
-    { main: 'b', sub: 'こ' },
-    { main: 'n', sub: 'み' },
-    { main: 'm', sub: 'も' },
+    { main: 'ᖑ', sub: 'a' },
+    { main: 'ᐅ', sub: 's' },
+    { main: 'ᖁ', sub: 'd' },
+    { main: 'ᑯ', sub: 'f' },
+    { main: 'ᑐ', sub: 'g' },
+    { main: 'ᓱ', sub: 'h' },
+    { main: 'ᒧ', sub: 'j' },
+    { main: 'ᓄ', sub: 'k' },
+    { main: 'ᓗ', sub: 'l' },
   ],
+  [
+    { main: 'ᖓ', sub: 'z' },
+    { main: 'ᐊ', sub: 'x' },
+    { main: 'ᖃ', sub: 'c' },
+    { main: 'ᑲ', sub: 'v' },
+    { main: 'ᑕ', sub: 'b' },
+    { main: 'ᓴ', sub: 'n' },
+    { main: 'ᒪ', sub: 'm' },
+    { main: 'ᔭ', sub: '/' },
+  ],
+];
+
+const javaneseKeyboardRows: Keycap[][] = [
+  [
+    { main: 'ꦄꦼ', sub: 'q' },
+    { main: 'ꦮ', sub: 'w' },
+    { main: 'ꦌ', sub: 'e' },
+    { main: 'ꦫ', sub: 'r' },
+    { main: 'ꦠ', sub: 't' },
+    { main: 'ꦪ', sub: 'y' },
+    { main: 'ꦈ', sub: 'u' },
+    { main: 'ꦆ', sub: 'i' },
+    { main: 'ꦎ', sub: 'o' },
+    { main: 'ꦥ', sub: 'p' },
+  ],
+  [
+    { main: 'ꦄ', sub: 'a' },
+    { main: 'ꦱ', sub: 's' },
+    { main: 'ꦢ', sub: 'd' },
+    { main: 'ꦉ', sub: 'f' },
+    { main: 'ꦒ', sub: 'g' },
+    { main: 'ꦲ', sub: 'h' },
+    { main: 'ꦗ', sub: 'j' },
+    { main: 'ꦏ', sub: 'k' },
+    { main: 'ꦭ', sub: 'l' },
+    { main: 'ꦛ', sub: ';' },
+    { main: 'ꦝ', sub: "'" },
+  ],
+  [
+    { main: 'ꦚ', sub: 'z' },
+    { main: 'ꦔ', sub: 'x' },
+    { main: 'ꦕ', sub: 'c' },
+    { main: 'ꦊ', sub: 'v' },
+    { main: 'ꦧ', sub: 'b' },
+    { main: 'ꦤ', sub: 'n' },
+    { main: 'ꦩ', sub: 'm' },
+    { main: '꧈', sub: ',' },
+    { main: '꧉', sub: '.' },
+    { main: '꧀', sub: '/' },
+  ],
+];
+
+const maldivianKeyboardRows: Keycap[][] = [
+  ['ް', 'އ', 'ެ', 'ރ', 'ތ', 'ޔ', 'ު', 'ި', 'ޮ', 'ޕ'],
+  ['ަ', 'ސ', 'ދ', 'ފ', 'ގ', 'ހ', 'ޖ', 'ކ', 'ލ'],
+  ['ޒ', 'ޗ', 'ވ', 'ބ', 'ނ', 'މ'],
+];
+
+const englishKeyboardRows: Keycap[][] = [
+  ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+  ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+  ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
 ];
 
 const languageOptions: {
   value: StudyLanguage;
   label: string;
   flag: string;
-  referenceContent: ReactNode;
+  referenceContent: ReactNode | null;
 }[] = [
+  {
+    value: 'english',
+    label: 'English',
+    flag: '🇺🇸',
+    referenceContent: (
+      <KeyboardReferenceCard direction="ltr" lang="en" rows={englishKeyboardRows} />
+    ),
+  },
   {
     value: 'arabic',
     label: 'Arabic',
@@ -191,9 +307,7 @@ const languageOptions: {
     value: 'chinese',
     label: 'Chinese',
     flag: '🇨🇳',
-    referenceContent: (
-      <KeyboardReferenceCard direction="ltr" lang="zh-Hans" rows={chineseKeyboardRows} />
-    ),
+    referenceContent: null,
   },
   {
     value: 'japanese',
@@ -279,6 +393,30 @@ const languageOptions: {
           ['ζ', 'χ', 'ψ', 'ω', 'β', 'ν', 'μ'],
         ]}
       />
+    ),
+  },
+  {
+    value: 'coptic',
+    label: 'Coptic',
+    flag: '🇪🇬',
+    referenceContent: (
+      <KeyboardReferenceCard direction="ltr" lang="cop" rows={copticKeyboardRows} />
+    ),
+  },
+  {
+    value: 'qaniujaaqpait',
+    label: 'Qaniujaaqpait',
+    flag: '🇨🇦',
+    referenceContent: (
+      <KeyboardReferenceCard direction="ltr" lang="iu" rows={qaniujaaqpaitKeyboardRows} />
+    ),
+  },
+  {
+    value: 'javanese',
+    label: 'Javanese',
+    flag: '🇮🇩',
+    referenceContent: (
+      <KeyboardReferenceCard direction="ltr" lang="jv" rows={javaneseKeyboardRows} />
     ),
   },
   {
@@ -475,6 +613,14 @@ const languageOptions: {
     ),
   },
   {
+    value: 'maldivian',
+    label: 'Maldivian',
+    flag: '🇲🇻',
+    referenceContent: (
+      <KeyboardReferenceCard direction="rtl" lang="dv" rows={maldivianKeyboardRows} />
+    ),
+  },
+  {
     value: 'marathi',
     label: 'Marathi',
     flag: '🇮🇳',
@@ -512,6 +658,26 @@ const languageOptions: {
       />
     ),
   },
+  {
+    value: 'cherokee',
+    label: 'Cherokee',
+    flag: '🇺🇸',
+    referenceContent: (
+      <KeyboardReferenceCard direction="ltr" lang="chr" rows={cherokeeKeyboardRows} />
+    ),
+  },
+  {
+    value: 'osage',
+    label: 'Osage',
+    flag: '🇺🇸',
+    referenceContent: <KeyboardReferenceCard direction="ltr" lang="osa" rows={osageKeyboardRows} />,
+  },
+  {
+    value: 'emoji',
+    label: 'Emojis',
+    flag: '🏁',
+    referenceContent: null,
+  },
 ];
 
 function KeyboardReferenceCard({
@@ -523,32 +689,35 @@ function KeyboardReferenceCard({
   lang: string;
   rows: Keycap[][];
 }) {
+  const bottomRowKeys =
+    lang === 'ar' || lang === 'fa' ? ['Enter', 'Space', 'Shift'] : ['Shift', 'Space', 'Enter'];
+
   return (
     <div className="p-4 sm:p-6" dir={direction} lang={lang}>
       <div className="space-y-3">
         {rows.map(row => (
           <div
             key={row.map(keycap => (typeof keycap === 'string' ? keycap : keycap.main)).join('|')}
-            className="flex flex-wrap justify-center gap-2"
+            className="flex flex-wrap justify-center gap-1.5"
           >
             {row.map(keycap => {
               const main = typeof keycap === 'string' ? keycap : keycap.main;
               const sub = typeof keycap === 'string' ? null : keycap.sub;
               const mainClassName =
                 main.length > 4
-                  ? 'text-sm font-semibold leading-tight sm:text-base'
+                  ? 'text-[0.72rem] font-semibold leading-tight sm:text-sm'
                   : main.length > 2
-                    ? 'text-lg font-medium leading-none sm:text-xl'
-                    : 'text-2xl font-medium leading-none sm:text-3xl';
+                    ? 'text-base font-medium leading-none sm:text-lg'
+                    : 'text-xl font-medium leading-none sm:text-2xl';
 
               return (
                 <div
                   key={`${main}-${sub ?? ''}`}
-                  className="flex h-14 min-w-[3.5rem] flex-col items-center justify-center border border-[var(--border)] px-3 text-zinc-950 sm:h-16 sm:min-w-[4rem]"
+                  className="flex h-11 min-w-[2.9rem] flex-col items-center justify-center border border-[var(--border)] px-2 text-zinc-950 sm:h-12 sm:min-w-[3.2rem]"
                 >
                   <span className={mainClassName}>{main}</span>
                   {sub ? (
-                    <span className="mt-1 text-[0.62rem] leading-none text-zinc-500 sm:text-[0.7rem]">
+                    <span className="mt-0.5 text-[0.56rem] leading-none text-zinc-500 sm:text-[0.62rem]">
                       {sub}
                     </span>
                   ) : null}
@@ -558,16 +727,17 @@ function KeyboardReferenceCard({
           </div>
         ))}
 
-        <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-          <div className="flex h-12 w-24 items-center justify-center border border-[var(--border)] text-xs uppercase tracking-[0.2em] text-zinc-500">
-            Shift
-          </div>
-          <div className="flex h-12 min-w-[12rem] items-center justify-center border border-[var(--border)] px-6 text-xs uppercase tracking-[0.2em] text-zinc-500 sm:min-w-[18rem]">
-            Space
-          </div>
-          <div className="flex h-12 w-24 items-center justify-center border border-[var(--border)] text-xs uppercase tracking-[0.2em] text-zinc-500">
-            Enter
-          </div>
+        <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1.5">
+          {bottomRowKeys.map(key => (
+            <div
+              key={key}
+              className={`flex h-10 items-center justify-center border border-[var(--border)] text-[0.65rem] uppercase tracking-[0.18em] text-zinc-500 ${
+                key === 'Space' ? 'min-w-[9rem] px-4 sm:min-w-[14rem]' : 'w-20'
+              }`}
+            >
+              {key}
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -580,11 +750,6 @@ export default function LanguageWorkspace() {
   const activeOption =
     languageOptions.find(option => option.value === activeLanguage) ?? languageOptions[0];
   const activeTabs = tabsByLanguage[activeLanguage];
-  const tabIcons: Record<TabValue, ReactNode> = {
-    typing: <KeyboardIcon />,
-    words: <WordsIcon />,
-    letters: <SoundIcon />,
-  };
 
   useEffect(() => {
     if (!activeTabs.some(tab => tab.value === activeTab)) {
@@ -596,10 +761,15 @@ export default function LanguageWorkspace() {
     <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-10">
       <aside className="border-b border-[var(--border)] pb-6 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-8">
         <div className="flex flex-col gap-6 lg:sticky lg:top-8">
-          <AppLogo />
+          <AppLogo
+            activeLanguage={activeLanguage}
+            activeTab={activeTab}
+            activeTabs={activeTabs}
+            onTabChange={setActiveTab}
+          />
 
           <nav
-            className="grid grid-cols-5 sm:grid-cols-6 lg:grid-cols-3"
+            className="grid grid-cols-5 sm:grid-cols-6 lg:grid-cols-1"
             role="tablist"
             aria-label="Study languages"
           >
@@ -610,7 +780,7 @@ export default function LanguageWorkspace() {
               <button
                 key={option.value}
                 type="button"
-                className={`-mb-px -mr-px flex aspect-square min-h-[3rem] items-center justify-center border border-[var(--border)] text-2xl leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 ${
+                className={`-mb-px -mr-px flex aspect-square min-h-[3rem] items-center justify-center border border-[var(--border)] text-2xl leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 lg:mr-0 lg:w-full lg:aspect-auto lg:min-h-[3.25rem] lg:justify-start lg:gap-3 lg:px-4 lg:text-left ${
                   isActive
                     ? 'border-zinc-950 bg-zinc-950 text-white'
                     : 'bg-transparent text-zinc-500 hover:text-zinc-950'
@@ -628,42 +798,14 @@ export default function LanguageWorkspace() {
                 title={option.label}
               >
                 <span aria-hidden="true">{option.flag}</span>
+                <span className="hidden text-sm font-medium leading-none lg:inline">
+                  {option.label}
+                </span>
               </button>
             );
           })}
           </nav>
 
-          <nav
-            className="inline-flex w-fit items-center rounded-full border border-[var(--border)] p-1"
-            role="tablist"
-            aria-label={`${activeLanguage} trainer exercises`}
-          >
-            {activeTabs.map(tab => {
-              const isActive = tab.value === activeTab;
-
-              return (
-                <button
-                  key={tab.value}
-                  type="button"
-                  className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 ${
-                    isActive
-                      ? 'bg-zinc-950 text-white'
-                      : 'bg-transparent text-zinc-500 hover:text-zinc-950'
-                  }`}
-                  onClick={() => setActiveTab(tab.value)}
-                  aria-selected={isActive}
-                  role="tab"
-                  tabIndex={isActive ? 0 : -1}
-                  id={`trainer-tab-${activeLanguage}-${tab.value}`}
-                  aria-controls={`trainer-tabpanel-${activeLanguage}-${tab.value}`}
-                  title={tab.label}
-                >
-                  {tabIcons[tab.value]}
-                  <span className="sr-only">{tab.label}</span>
-                </button>
-              );
-            })}
-          </nav>
         </div>
       </aside>
 
@@ -676,7 +818,7 @@ export default function LanguageWorkspace() {
         <section className="flex flex-col gap-10">
           <TrainerTabs language={activeLanguage} activeTab={activeTab} />
 
-          {activeTab === 'typing' ? (
+          {activeTab === 'typing' && activeOption.referenceContent ? (
             <section className="border-t border-[var(--border)] pt-10">
               {activeOption.referenceContent}
             </section>

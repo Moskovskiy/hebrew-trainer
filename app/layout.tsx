@@ -6,15 +6,21 @@ import {
   Noto_Nastaliq_Urdu,
   Noto_Sans,
   Noto_Sans_Armenian,
+  Noto_Sans_Canadian_Aboriginal,
+  Noto_Sans_Cherokee,
+  Noto_Sans_Coptic,
   Noto_Sans_Devanagari,
   Noto_Sans_Ethiopic,
   Noto_Sans_Georgian,
   Noto_Sans_Gujarati,
+  Noto_Sans_Javanese,
   Noto_Sans_JP,
   Noto_Sans_KR,
   Noto_Sans_Khmer,
   Noto_Sans_Myanmar,
+  Noto_Sans_Osage,
   Noto_Sans_SC,
+  Noto_Sans_Thaana,
   Noto_Sans_Thai,
   Noto_Serif_Tibetan,
 } from 'next/font/google';
@@ -91,6 +97,36 @@ const notoSansGujarati = Noto_Sans_Gujarati({
   variable: '--font-sans-gujarati',
 });
 
+const notoSansJavanese = Noto_Sans_Javanese({
+  subsets: ['javanese'],
+  weight: ['400', '500', '700'],
+  variable: '--font-sans-javanese',
+});
+
+const notoSansCherokee = Noto_Sans_Cherokee({
+  subsets: ['cherokee'],
+  weight: ['400', '500', '700'],
+  variable: '--font-sans-cherokee',
+});
+
+const notoSansCanadianAboriginal = Noto_Sans_Canadian_Aboriginal({
+  subsets: ['canadian-aboriginal'],
+  weight: ['400', '500', '700'],
+  variable: '--font-sans-qaniujaaqpait',
+});
+
+const notoSansCoptic = Noto_Sans_Coptic({
+  subsets: ['coptic'],
+  weight: ['400'],
+  variable: '--font-sans-coptic',
+});
+
+const notoSansOsage = Noto_Sans_Osage({
+  subsets: ['osage'],
+  weight: ['400'],
+  variable: '--font-sans-osage',
+});
+
 const notoSansDevanagari = Noto_Sans_Devanagari({
   subsets: ['devanagari'],
   weight: ['400', '500', '700'],
@@ -101,6 +137,12 @@ const notoSansKhmer = Noto_Sans_Khmer({
   subsets: ['khmer'],
   weight: ['400', '500', '700'],
   variable: '--font-sans-khmer',
+});
+
+const notoSansThaana = Noto_Sans_Thaana({
+  subsets: ['thaana'],
+  weight: ['400', '500', '700'],
+  variable: '--font-sans-maldivian',
 });
 
 const notoSerifTibetan = Noto_Serif_Tibetan({
@@ -118,14 +160,14 @@ const notoNastaliqUrdu = Noto_Nastaliq_Urdu({
 export const metadata = {
   title: 'Script Trainer',
   description:
-    'Practice Hebrew, Chinese, Japanese, Korean, Russian, Ethiopian, Greek, Thai, Armenian, Georgian, Gujarati, Khmer, Sanskrit, Tibetan, Urdu, Marathi, Arabic, Farsi, and Myanmar in a clean minimalist interface.',
+    'Practice English, Hebrew, Chinese, Japanese, Korean, Russian, Ethiopian, Greek, Coptic, Qaniujaaqpait, Thai, Armenian, Georgian, Gujarati, Javanese, Khmer, Sanskrit, Tibetan, Urdu, Maldivian, Marathi, Arabic, Farsi, Myanmar, Cherokee, Osage, and emoji in a clean minimalist interface.',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body
-        className={`${notoSans.variable} ${heebo.variable} ${notoSansKr.variable} ${notoNaskhArabic.variable} ${notoSansMyanmar.variable} ${notoSansEthiopic.variable} ${notoSansSc.variable} ${notoSansJp.variable} ${notoSansThai.variable} ${notoSansArmenian.variable} ${notoSansGeorgian.variable} ${notoSansGujarati.variable} ${notoSansDevanagari.variable} ${notoSansKhmer.variable} ${notoSerifTibetan.variable} ${notoNastaliqUrdu.variable} min-h-screen bg-[var(--page-background)] text-[var(--foreground)]`}
+        className={`${notoSans.variable} ${heebo.variable} ${notoSansKr.variable} ${notoNaskhArabic.variable} ${notoSansMyanmar.variable} ${notoSansEthiopic.variable} ${notoSansSc.variable} ${notoSansJp.variable} ${notoSansThai.variable} ${notoSansArmenian.variable} ${notoSansGeorgian.variable} ${notoSansGujarati.variable} ${notoSansJavanese.variable} ${notoSansCherokee.variable} ${notoSansCanadianAboriginal.variable} ${notoSansCoptic.variable} ${notoSansOsage.variable} ${notoSansDevanagari.variable} ${notoSansKhmer.variable} ${notoSansThaana.variable} ${notoSerifTibetan.variable} ${notoNastaliqUrdu.variable} min-h-screen bg-[var(--page-background)] text-[var(--foreground)]`}
       >
         {children}
       </body>

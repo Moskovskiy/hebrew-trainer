@@ -1,5 +1,12 @@
 'use client';
 
+import { cherokeeLetters } from '../data/cherokee';
+import { copticLetters } from '../data/coptic';
+import { emojiEntries } from '../data/emoji';
+import { javaneseLetters } from '../data/javanese';
+import { maldivianLetters } from '../data/maldivian';
+import { osageLetters } from '../data/osage';
+import { qaniujaaqpaitEntries } from '../data/qaniujaaqpait';
 import HebrewWordTrainer from './HebrewWordTrainer';
 import HebrewLetterTrainer from './HebrewLetterTrainer';
 import KoreanLetterTrainer from './KoreanLetterTrainer';
@@ -25,6 +32,7 @@ import {
 } from '../data/scriptLetters';
 
 export type StudyLanguage =
+  | 'english'
   | 'hebrew'
   | 'chinese'
   | 'japanese'
@@ -36,14 +44,21 @@ export type StudyLanguage =
   | 'armenian'
   | 'georgian'
   | 'gujarati'
+  | 'javanese'
   | 'khmer'
   | 'sanskrit'
   | 'tibetan'
   | 'urdu'
+  | 'maldivian'
   | 'marathi'
   | 'arabic'
   | 'farsi'
-  | 'myanmar';
+  | 'myanmar'
+  | 'cherokee'
+  | 'osage'
+  | 'emoji'
+  | 'coptic'
+  | 'qaniujaaqpait';
 
 export type TabValue = 'typing' | 'letters' | 'words';
 
@@ -51,6 +66,13 @@ export const tabsByLanguage: Record<
   StudyLanguage,
   { value: TabValue; label: string; description: string }[]
 > = {
+  english: [
+    {
+      value: 'typing',
+      label: 'Keyboard Practice',
+      description: 'Type generated English prompts and build steady QWERTY speed and accuracy.',
+    },
+  ],
   hebrew: [
     {
       value: 'typing',
@@ -140,6 +162,30 @@ export const tabsByLanguage: Record<
       description: 'Match Greek letters to their common pronunciations and reinforce quick recall.',
     },
   ],
+  coptic: [
+    {
+      value: 'typing',
+      label: 'Keyboard Practice',
+      description: 'Type generated Coptic alphabet drills and build familiarity with Coptic letterforms.',
+    },
+    {
+      value: 'letters',
+      label: 'Sound Practice',
+      description: 'Match Coptic letters to their names and build quick script recognition.',
+    },
+  ],
+  qaniujaaqpait: [
+    {
+      value: 'typing',
+      label: 'Keyboard Practice',
+      description: 'Type generated Qaniujaaqpait drills and build comfort with Inuktitut syllabics.',
+    },
+    {
+      value: 'letters',
+      label: 'Sound Practice',
+      description: 'Match Qaniujaaqpait syllabics to their common sounds and finals.',
+    },
+  ],
   thai: [
     {
       value: 'typing',
@@ -186,6 +232,18 @@ export const tabsByLanguage: Record<
       value: 'letters',
       label: 'Sound Practice',
       description: 'Match Gujarati letters to their usual sounds.',
+    },
+  ],
+  javanese: [
+    {
+      value: 'typing',
+      label: 'Keyboard Practice',
+      description: 'Type generated Javanese drills and build comfort with Javanese script input.',
+    },
+    {
+      value: 'letters',
+      label: 'Sound Practice',
+      description: 'Match Javanese letters to their common sounds and romanized names.',
     },
   ],
   khmer: [
@@ -236,6 +294,18 @@ export const tabsByLanguage: Record<
       description: 'Match Urdu letters to their usual names and sounds.',
     },
   ],
+  maldivian: [
+    {
+      value: 'typing',
+      label: 'Keyboard Practice',
+      description: 'Type generated Maldivian prompts right-to-left and build comfort with Thaana script.',
+    },
+    {
+      value: 'letters',
+      label: 'Sound Practice',
+      description: 'Match Thaana letters to their common sounds and romanized forms.',
+    },
+  ],
   marathi: [
     {
       value: 'typing',
@@ -282,6 +352,42 @@ export const tabsByLanguage: Record<
       value: 'letters',
       label: 'Sound Practice',
       description: 'Match Persian letters to their common sounds, including the characters unique to Farsi.',
+    },
+  ],
+  cherokee: [
+    {
+      value: 'typing',
+      label: 'Keyboard Practice',
+      description: 'Type generated Cherokee syllabary drills and build comfort with the Cherokee keyboard layout.',
+    },
+    {
+      value: 'letters',
+      label: 'Sound Practice',
+      description: 'Match Cherokee syllabary symbols to their common sounds.',
+    },
+  ],
+  osage: [
+    {
+      value: 'typing',
+      label: 'Keyboard Practice',
+      description: 'Type generated Osage alphabet drills and build comfort with the Osage keyboard layout.',
+    },
+    {
+      value: 'letters',
+      label: 'Sound Practice',
+      description: 'Match Osage letters to their common sounds.',
+    },
+  ],
+  emoji: [
+    {
+      value: 'typing',
+      label: 'Keyboard Practice',
+      description: 'Type generated emoji prompts and push your speed on short visual sequences.',
+    },
+    {
+      value: 'letters',
+      label: 'Sound Practice',
+      description: 'Match each emoji to its name and build instant visual recall.',
     },
   ],
 };
@@ -365,6 +471,12 @@ export default function TrainerTabs({
         instructionText:
           'Choose the sound that best matches the Gujarati letter. The next card appears automatically.',
       },
+      javanese: {
+        entries: javaneseLetters,
+        promptLabel: 'Javanese letter',
+        instructionText:
+          'Choose the sound that best matches the Javanese letter. The next card appears automatically.',
+      },
       khmer: {
         entries: khmerLetters,
         promptLabel: 'Khmer letter',
@@ -388,6 +500,12 @@ export default function TrainerTabs({
         promptLabel: 'Urdu letter',
         instructionText:
           'Choose the sound that best matches the Urdu letter. The next card appears automatically.',
+      },
+      maldivian: {
+        entries: maldivianLetters,
+        promptLabel: 'Maldivian letter',
+        instructionText:
+          'Choose the sound that best matches the Thaana letter. The next card appears automatically.',
       },
       marathi: {
         entries: devanagariLetters,
@@ -413,8 +531,38 @@ export default function TrainerTabs({
         instructionText:
           'Choose the sound that best matches the Farsi letter. The next card appears automatically.',
       },
+      cherokee: {
+        entries: cherokeeLetters,
+        promptLabel: 'Cherokee syllable',
+        instructionText:
+          'Choose the sound that best matches the Cherokee syllabary symbol. The next card appears automatically.',
+      },
+      osage: {
+        entries: osageLetters,
+        promptLabel: 'Osage letter',
+        instructionText:
+          'Choose the sound that best matches the Osage letter. The next card appears automatically.',
+      },
+      emoji: {
+        entries: emojiEntries,
+        promptLabel: 'Emoji',
+        instructionText:
+          'Choose the name that best matches the emoji. The next card appears automatically.',
+      },
+      coptic: {
+        entries: copticLetters,
+        promptLabel: 'Coptic letter',
+        instructionText:
+          'Choose the name that best matches the Coptic letter. The next card appears automatically.',
+      },
+      qaniujaaqpait: {
+        entries: qaniujaaqpaitEntries,
+        promptLabel: 'Qaniujaaqpait syllabic',
+        instructionText:
+          'Choose the sound that best matches the Qaniujaaqpait syllabic. The next card appears automatically.',
+      },
     } satisfies Record<
-      Exclude<StudyLanguage, 'hebrew' | 'korean'>,
+      Exclude<StudyLanguage, 'hebrew' | 'korean' | 'english'>,
       {
         entries: { symbol: string; sounds: string[] }[];
         promptLabel: string;
