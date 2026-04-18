@@ -1351,7 +1351,7 @@ export default function LanguageWorkspace() {
             />
 
             {activeTab === 'typing' && activeOption.referenceContent ? (
-              <section>
+              <section className="lg:rounded-[2rem] lg:border lg:border-[var(--border)]">
                 {activeOption.referenceContent}
               </section>
             ) : null}
