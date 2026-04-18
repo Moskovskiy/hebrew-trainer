@@ -2,7 +2,7 @@
 
 import { type ReactNode, useState } from 'react';
 
-import TrainerTabs, { StudyLanguage } from './TrainerTabs';
+import TrainerTabs, { type StudyLanguage, type TabValue } from './TrainerTabs';
 import HebrewKeyboardLayout from './HebrewKeyboardLayout';
 import KoreanKeyboardLayout from './KoreanKeyboardLayout';
 
@@ -142,6 +142,7 @@ function ScriptReferenceCard({
 
 export default function LanguageWorkspace() {
   const [activeLanguage, setActiveLanguage] = useState<StudyLanguage>('hebrew');
+  const [activeTab, setActiveTab] = useState<TabValue>('typing');
   const activeOption =
     languageOptions.find(option => option.value === activeLanguage) ?? languageOptions[0];
 
@@ -164,7 +165,10 @@ export default function LanguageWorkspace() {
                   ? 'border-zinc-950 text-zinc-950'
                   : 'border-transparent text-zinc-500 hover:text-zinc-950'
               }`}
-              onClick={() => setActiveLanguage(option.value)}
+              onClick={() => {
+                setActiveLanguage(option.value);
+                setActiveTab('typing');
+              }}
               aria-selected={isActive}
               role="tab"
               tabIndex={isActive ? 0 : -1}
@@ -184,24 +188,26 @@ export default function LanguageWorkspace() {
         className="flex flex-col gap-10"
       >
         <section>
-          <TrainerTabs language={activeLanguage} />
+          <TrainerTabs language={activeLanguage} activeTab={activeTab} onTabChange={setActiveTab} />
         </section>
 
-        <section className="border-t border-[var(--border)] pt-10">
-          <div className="max-w-2xl">
-            <p className="text-[0.72rem] uppercase tracking-[0.28em] text-zinc-500">
-              {activeOption.referenceEyebrow}
-            </p>
-            <h2 className="mt-3 text-2xl font-medium tracking-[-0.03em] text-zinc-950 sm:text-3xl">
-              {activeOption.referenceHeading}
-            </h2>
-            <p className="mt-3 text-base leading-7 text-zinc-600">
-              {activeOption.referenceDescription}
-            </p>
-          </div>
+        {activeTab === 'typing' ? (
+          <section className="border-t border-[var(--border)] pt-10">
+            <div className="max-w-2xl">
+              <p className="text-[0.72rem] uppercase tracking-[0.28em] text-zinc-500">
+                {activeOption.referenceEyebrow}
+              </p>
+              <h2 className="mt-3 text-2xl font-medium tracking-[-0.03em] text-zinc-950 sm:text-3xl">
+                {activeOption.referenceHeading}
+              </h2>
+              <p className="mt-3 text-base leading-7 text-zinc-600">
+                {activeOption.referenceDescription}
+              </p>
+            </div>
 
-          <div className="mt-8">{activeOption.referenceContent}</div>
-        </section>
+            <div className="mt-8">{activeOption.referenceContent}</div>
+          </section>
+        ) : null}
       </div>
     </div>
   );
