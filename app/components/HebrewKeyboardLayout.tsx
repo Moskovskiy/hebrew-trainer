@@ -1,4 +1,4 @@
-import { useVirtualKeyboard } from './VirtualKeyboardContext';
+import { VIRTUAL_BACKSPACE_KEY, useVirtualKeyboard } from './VirtualKeyboardContext';
 
 const numberRow = ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='].map(key => ({
   main: '',
@@ -112,9 +112,11 @@ export default function HebrewKeyboardLayout() {
           </button>
           <button
             type="button"
+            onMouseDown={event => event.preventDefault()}
+            onClick={() => onVirtualKeyPress?.(VIRTUAL_BACKSPACE_KEY)}
             className="flex h-7 w-12 items-center justify-center rounded-lg border border-[var(--border)] text-[0.46rem] uppercase tracking-[0.16em] text-zinc-500 sm:h-10 sm:w-20 sm:rounded-xl sm:text-[0.65rem] sm:tracking-[0.18em]"
           >
-            Enter
+            Backspace
           </button>
         </div>
       </div>

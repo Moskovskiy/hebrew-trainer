@@ -10,6 +10,7 @@ import { maldivianPracticePrompts } from '../data/maldivian';
 import { osagePracticePrompts } from '../data/osage';
 import { qaniujaaqpaitPracticePrompts } from '../data/qaniujaaqpait';
 import { type Language, randomSentence } from '../data/dictionaries';
+import { VIRTUAL_BACKSPACE_KEY } from './VirtualKeyboardContext';
 
 type TypingLanguage =
   | Extract<
@@ -354,8 +355,14 @@ export default function TypingTrainer({
       const inputElement = inputRef.current;
       const selectionStart = inputElement?.selectionStart ?? input.length;
       const selectionEnd = inputElement?.selectionEnd ?? input.length;
-      const nextValue = `${input.slice(0, selectionStart)}${key}${input.slice(selectionEnd)}`;
-      const nextCursorPosition = selectionStart + key.length;
+      const hasSelection = selectionStart !== selectionEnd;
+      const isBackspace = key === VIRTUAL_BACKSPACE_KEY;
+      const deleteStart =
+        isBackspace && !hasSelection ? Math.max(selectionStart - 1, 0) : selectionStart;
+      const nextValue = isBackspace
+        ? `${input.slice(0, deleteStart)}${input.slice(selectionEnd)}`
+        : `${input.slice(0, selectionStart)}${key}${input.slice(selectionEnd)}`;
+      const nextCursorPosition = isBackspace ? deleteStart : selectionStart + key.length;
 
       applyInputValue(nextValue);
 
@@ -410,27 +417,33 @@ export default function TypingTrainer({
           <div
             dir={languageConfig.direction}
             lang={languageConfig.htmlLang}
-            className={`relative min-h-[6.5rem] px-5 pb-5 pt-11 text-[1.65rem] leading-loose tracking-[0.03em] text-zinc-950 sm:px-6 sm:pb-6 sm:pt-12 sm:text-3xl ${
+            className={`min-h-[6.5rem] px-5 py-5 text-[1.65rem] leading-loose tracking-[0.03em] text-zinc-950 sm:px-6 sm:py-6 sm:text-3xl ${
               languageConfig.direction === 'rtl' ? 'text-right' : 'text-left'
             }`}
           >
-            <button
-              type="button"
-              onClick={moveToNextPrompt}
-              className={`absolute top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-500 transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 ${
-                languageConfig.direction === 'rtl' ? 'left-3' : 'right-3'
+            <div
+              className={`flex items-start gap-3 ${
+                languageConfig.direction === 'rtl' ? 'flex-row' : 'flex-row-reverse'
               }`}
-              aria-label="Load a new prompt"
-              title="New prompt"
             >
-              <RefreshIcon />
-            </button>
+              <button
+                type="button"
+                onClick={moveToNextPrompt}
+                className="mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-zinc-500 transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
+                aria-label="Load a new prompt"
+                title="New prompt"
+              >
+                <RefreshIcon />
+              </button>
 
-            {promptUnits.map((char, idx) => (
-              <span key={idx} className={getCharClass(char, idx)}>
-                {char}
-              </span>
-            ))}
+              <div className="min-w-0 flex-1">
+                {promptUnits.map((char, idx) => (
+                  <span key={idx} className={getCharClass(char, idx)}>
+                    {char}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
 
           <label>
@@ -445,7 +458,7 @@ export default function TypingTrainer({
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck={false}
-              className={`w-full rounded-2xl bg-zinc-100 px-4 py-3.5 text-xl text-zinc-950 outline-none transition focus:bg-zinc-200 sm:py-4 ${
+              className={`min-h-[80px] w-full rounded-2xl bg-zinc-100 px-4 py-3.5 text-xl text-zinc-950 outline-none transition focus:bg-zinc-200 sm:py-4 ${
                 languageConfig.direction === 'rtl' ? 'text-right' : 'text-left'
               }`}
               aria-label={`Type the ${languageConfig.label} prompt`}

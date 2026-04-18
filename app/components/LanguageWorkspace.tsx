@@ -5,7 +5,11 @@ import { type ReactNode, useEffect, useState } from 'react';
 import TrainerTabs, { tabsByLanguage, type StudyLanguage, type TabValue } from './TrainerTabs';
 import HebrewKeyboardLayout from './HebrewKeyboardLayout';
 import KoreanKeyboardLayout from './KoreanKeyboardLayout';
-import { VirtualKeyboardContext, useVirtualKeyboard } from './VirtualKeyboardContext';
+import {
+  VirtualKeyboardContext,
+  VIRTUAL_BACKSPACE_KEY,
+  useVirtualKeyboard,
+} from './VirtualKeyboardContext';
 
 type Keycap = string | { main: string; sub?: string };
 type SidebarStat = { label: string; value: string | number };
@@ -895,7 +899,7 @@ function KeyboardReferenceCard({
 }) {
   const onVirtualKeyPress = useVirtualKeyboard();
   const bottomRowKeys =
-    lang === 'ar' || lang === 'fa' ? ['Enter', 'Space', 'Shift'] : ['Shift', 'Space', 'Enter'];
+    lang === 'ar' || lang === 'fa' ? ['Backspace', 'Space', 'Shift'] : ['Shift', 'Space', 'Backspace'];
   const mainKeyBaseClassName =
     'absolute right-1 top-1 text-right transition-colors group-hover:text-white sm:right-1.5 sm:top-1.5';
   const legendRows =
@@ -1009,6 +1013,11 @@ function KeyboardReferenceCard({
               onClick={() => {
                 if (key === 'Space') {
                   onVirtualKeyPress?.(' ');
+                  return;
+                }
+
+                if (key === 'Backspace') {
+                  onVirtualKeyPress?.(VIRTUAL_BACKSPACE_KEY);
                 }
               }}
               className={`flex h-7 items-center justify-center rounded-lg border border-[var(--border)] text-[0.46rem] uppercase tracking-[0.16em] text-zinc-500 sm:h-10 sm:rounded-xl sm:text-[0.65rem] sm:tracking-[0.18em] ${
