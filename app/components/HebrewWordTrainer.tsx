@@ -35,6 +35,21 @@ const buildOptionSet = (currentIndex: number) => {
   return Array.from(options).sort(() => Math.random() - 0.5);
 };
 
+function RefreshIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="h-4 w-4 fill-none stroke-current stroke-[1.9]"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 12a9 9 0 1 1-3.15-6.86" />
+      <path d="M21 3v6h-6" />
+    </svg>
+  );
+}
+
 export default function HebrewWordTrainer({
   onStatsChange,
 }: {
@@ -94,39 +109,52 @@ export default function HebrewWordTrainer({
 
   const getOptionClassName = (option: string) => {
     const baseStyles =
-      'flex min-h-[4.5rem] items-center justify-center border px-4 py-4 text-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:text-base';
+      'flex min-h-[4rem] items-center justify-center rounded-2xl px-4 py-3 text-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:min-h-[4.5rem] sm:px-5 sm:py-4 sm:text-base';
 
     if (!selectedOption) {
-      return `${baseStyles} border-[var(--border)] text-zinc-700 hover:border-zinc-950 hover:text-zinc-950`;
+      return `${baseStyles} text-zinc-700 hover:bg-zinc-950 hover:text-white`;
     }
 
     if (option === currentWord.translation) {
-      return `${baseStyles} border-zinc-950 bg-zinc-950 text-white`;
+      return `${baseStyles} bg-zinc-950 text-white`;
     }
 
     if (option === selectedOption) {
-      return `${baseStyles} border-zinc-950 text-zinc-400`;
+      return `${baseStyles} bg-zinc-100 text-zinc-400`;
     }
 
-    return `${baseStyles} border-[var(--border)] text-zinc-400`;
+    return `${baseStyles} text-zinc-400`;
   };
 
   return (
-    <div className="flex flex-col gap-8">
-      <section className="p-6 sm:p-8">
-        <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
+      <section className="p-4 sm:p-6">
+        <div className="flex flex-col gap-4">
           <div
             dir="rtl"
             lang="he"
-            className="min-h-[8rem] border border-[var(--border)] p-8 text-center"
+            className="relative rounded-[2rem] bg-zinc-100/70 px-6 py-8 text-center sm:px-8 sm:py-10"
             aria-label={`Hebrew word ${currentWord.word}`}
           >
-            <div className="text-[3.75rem] font-medium leading-none text-zinc-950 sm:text-[5rem]">
+            <button
+              type="button"
+              onClick={goToNextWord}
+              className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-500 transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
+              aria-label="Skip to the next card"
+              title="Skip"
+            >
+              <RefreshIcon />
+            </button>
+            <p className="sr-only">
+              Choose the English translation that matches the Hebrew word. The next card appears
+              automatically.
+            </p>
+            <div className="text-[4.5rem] font-medium leading-none text-zinc-950 sm:text-[6.25rem]">
               {currentWord.word}
             </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-2 sm:grid-cols-2">
             {options.map(option => (
               <button
                 key={option}
@@ -138,26 +166,11 @@ export default function HebrewWordTrainer({
               </button>
             ))}
           </div>
-
-          <div className="flex flex-col gap-4 border-t border-[var(--border)] pt-4 text-sm text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
-            <p>Choose the English translation that matches the Hebrew word. The next card appears automatically.</p>
-            <button
-              type="button"
-              onClick={goToNextWord}
-              className="inline-flex items-center justify-center border border-zinc-950 px-4 py-2 text-sm font-medium text-zinc-950 transition hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
-            >
-              Skip
-            </button>
-          </div>
         </div>
       </section>
 
-      <aside className="border-t border-[var(--border)] p-5 lg:hidden">
-        <div className="space-y-5 text-sm">
-          <div>
-            <p className="text-zinc-500">Words</p>
-            <p className="mt-1 text-2xl font-medium text-zinc-950">{hebrewCommonWords.length}</p>
-          </div>
+      <aside className="p-4 pt-0 lg:hidden">
+        <div className="space-y-4 text-sm">
           <div>
             <p className="text-zinc-500">Correct</p>
             <p className="mt-1 text-2xl font-medium text-zinc-950">{score.correct}</p>
