@@ -172,10 +172,20 @@ const languageOptions: {
   referenceContent: ReactNode;
 }[] = [
   {
-    value: 'hebrew',
-    label: 'Hebrew',
-    flag: '🇮🇱',
-    referenceContent: <HebrewKeyboardLayout />,
+    value: 'arabic',
+    label: 'Arabic',
+    flag: '🇸🇦',
+    referenceContent: (
+      <KeyboardReferenceCard
+        direction="rtl"
+        lang="ar"
+        rows={[
+          ['ض', 'ص', 'ث', 'ق', 'ف', 'غ', 'ع', 'ه', 'خ', 'ح'],
+          ['ش', 'س', 'ي', 'ب', 'ل', 'ا', 'ت', 'ن', 'م', 'ك'],
+          ['ئ', 'ء', 'ؤ', 'ر', 'ى', 'ة', 'و', 'ز', 'ظ', 'ط'],
+        ]}
+      />
+    ),
   },
   {
     value: 'chinese',
@@ -326,6 +336,12 @@ const languageOptions: {
         ]}
       />
     ),
+  },
+  {
+    value: 'hebrew',
+    label: 'Hebrew',
+    flag: '🇮🇱',
+    referenceContent: <HebrewKeyboardLayout />,
   },
   {
     value: 'georgian',
@@ -481,22 +497,6 @@ const languageOptions: {
     ),
   },
   {
-    value: 'arabic',
-    label: 'Arabic',
-    flag: '🇸🇦',
-    referenceContent: (
-      <KeyboardReferenceCard
-        direction="rtl"
-        lang="ar"
-        rows={[
-          ['ض', 'ص', 'ث', 'ق', 'ف', 'غ', 'ع', 'ه', 'خ', 'ح'],
-          ['ش', 'س', 'ي', 'ب', 'ل', 'ا', 'ت', 'ن', 'م', 'ك'],
-          ['ئ', 'ء', 'ؤ', 'ر', 'ى', 'ة', 'و', 'ز', 'ظ', 'ط'],
-        ]}
-      />
-    ),
-  },
-  {
     value: 'farsi',
     label: 'Farsi',
     flag: '🇮🇷',
@@ -575,7 +575,7 @@ function KeyboardReferenceCard({
 }
 
 export default function LanguageWorkspace() {
-  const [activeLanguage, setActiveLanguage] = useState<StudyLanguage>('hebrew');
+  const [activeLanguage, setActiveLanguage] = useState<StudyLanguage>('arabic');
   const [activeTab, setActiveTab] = useState<TabValue>('typing');
   const activeOption =
     languageOptions.find(option => option.value === activeLanguage) ?? languageOptions[0];
