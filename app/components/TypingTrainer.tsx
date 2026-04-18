@@ -458,7 +458,7 @@ export default function TypingTrainer({
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck={false}
-              className={`min-h-[80px] w-full rounded-2xl bg-zinc-100 px-4 py-3.5 text-xl text-zinc-950 outline-none transition focus:bg-zinc-200 sm:py-4 ${
+              className={`min-h-[160px] w-full rounded-2xl bg-zinc-100 px-4 py-3.5 text-xl text-zinc-950 outline-none transition focus:bg-zinc-200 sm:py-4 ${
                 languageConfig.direction === 'rtl' ? 'text-right' : 'text-left'
               }`}
               aria-label={`Type the ${languageConfig.label} prompt`}

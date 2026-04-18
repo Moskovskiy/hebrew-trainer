@@ -13,6 +13,7 @@ import {
 
 type Keycap = string | { main: string; sub?: string };
 type SidebarStat = { label: string; value: string | number };
+type ResolvedKeycap = { main: string; sub: string };
 
 const usTopLegendRow = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\'];
 const usHomeLegendRow = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'"];
@@ -20,11 +21,110 @@ const usBottomLegendRow = ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'];
 const usNumberLegendRow = ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='];
 const defaultNumberRow: Keycap[] = usNumberLegendRow.map(key => ({ main: '', sub: key }));
 
-const keyboardLegendOverrides: Partial<Record<string, string[][]>> = {
-  el: [usHomeLegendRow.slice(1), usHomeLegendRow.slice(0, 9), usBottomLegendRow.slice(0, 7)],
-};
-
 const defaultLetterLegendRows = [usTopLegendRow, usHomeLegendRow, usBottomLegendRow];
+const defaultLetterLegendRowsFlat = defaultLetterLegendRows.flat();
+
+const readMainValue = (keycap?: Keycap) => (typeof keycap === 'string' ? keycap : (keycap?.main ?? ''));
+const readSubValue = (keycap?: Keycap) => (typeof keycap === 'string' ? null : (keycap?.sub ?? null));
+
+const buildReferenceRows = (rows: Keycap[][]) => {
+  const resolvedRows: ResolvedKeycap[][] = defaultLetterLegendRows.map(legendRow =>
+    legendRow.map(legend => ({ main: '', sub: legend })),
+  );
+  const usedSlotsByRow = defaultLetterLegendRows.map(() => new Set<number>());
+  const overflow: Keycap[] = [];
+
+  const placeOnSpecificRow = (rowIndex: number, keycap: Keycap) => {
+    const legendRow = defaultLetterLegendRows[rowIndex];
+    const usedSlots = usedSlotsByRow[rowIndex];
+    const sub = readSubValue(keycap);
+    let targetIndex = sub ? legendRow.indexOf(sub) : -1;
+
+    if (targetIndex !== -1 && usedSlots.has(targetIndex)) {
+      targetIndex = -1;
+    }
+
+    if (targetIndex === -1) {
+      targetIndex = legendRow.findIndex((_, index) => !usedSlots.has(index));
+    }
+
+    if (targetIndex === -1) {
+      overflow.push(keycap);
+      return;
+    }
+
+    usedSlots.add(targetIndex);
+    const legend = legendRow[targetIndex];
+    const main = readMainValue(keycap);
+    resolvedRows[rowIndex][targetIndex] = { main: main === legend ? '' : main, sub: legend };
+  };
+
+  rows.forEach((row, rowIndex) => {
+    if (rowIndex >= defaultLetterLegendRows.length) {
+      overflow.push(...row);
+      return;
+    }
+
+    row.forEach(keycap => {
+      placeOnSpecificRow(rowIndex, keycap);
+    });
+  });
+
+  const findGlobalSlot = (keycap: Keycap) => {
+    const sub = readSubValue(keycap);
+
+    if (sub) {
+      const globalIndex = defaultLetterLegendRowsFlat.indexOf(sub);
+
+      if (globalIndex !== -1) {
+        const rowIndex = defaultLetterLegendRows.findIndex((legendRow, legendRowIndex) => {
+          const rowStart = defaultLetterLegendRows
+            .slice(0, legendRowIndex)
+            .reduce((sum, row) => sum + row.length, 0);
+          return globalIndex >= rowStart && globalIndex < rowStart + legendRow.length;
+        });
+
+        if (rowIndex !== -1) {
+          const rowStart = defaultLetterLegendRows
+            .slice(0, rowIndex)
+            .reduce((sum, row) => sum + row.length, 0);
+          const targetIndex = globalIndex - rowStart;
+
+          if (!usedSlotsByRow[rowIndex].has(targetIndex)) {
+            return { rowIndex, targetIndex };
+          }
+        }
+      }
+    }
+
+    for (let rowIndex = 0; rowIndex < defaultLetterLegendRows.length; rowIndex += 1) {
+      const targetIndex = defaultLetterLegendRows[rowIndex].findIndex(
+        (_, index) => !usedSlotsByRow[rowIndex].has(index),
+      );
+
+      if (targetIndex !== -1) {
+        return { rowIndex, targetIndex };
+      }
+    }
+
+    return null;
+  };
+
+  overflow.forEach(keycap => {
+    const slot = findGlobalSlot(keycap);
+
+    if (!slot) {
+      return;
+    }
+
+    usedSlotsByRow[slot.rowIndex].add(slot.targetIndex);
+    const legend = defaultLetterLegendRows[slot.rowIndex][slot.targetIndex];
+    const main = readMainValue(keycap);
+    resolvedRows[slot.rowIndex][slot.targetIndex] = { main: main === legend ? '' : main, sub: legend };
+  });
+
+  return resolvedRows;
+};
 
 function KeyboardIcon() {
   return (
@@ -887,7 +987,7 @@ function DesktopStatsRail({ stats }: { stats: SidebarStat[] }) {
 }
 
 function KeyboardReferenceCard({
-  direction,
+  direction: _direction,
   lang,
   numberRow,
   rows,
@@ -898,20 +998,14 @@ function KeyboardReferenceCard({
   rows: Keycap[][];
 }) {
   const onVirtualKeyPress = useVirtualKeyboard();
-  const bottomRowKeys =
-    lang === 'ar' || lang === 'fa' ? ['Backspace', 'Space', 'Shift'] : ['Shift', 'Space', 'Backspace'];
+  const bottomRowKeys = ['Shift', 'Space', 'Backspace'];
   const mainKeyBaseClassName =
     'absolute right-1 top-1 text-right transition-colors group-hover:text-white sm:right-1.5 sm:top-1.5';
-  const legendRows =
-    keyboardLegendOverrides[lang] ??
-    rows.map((row, rowIndex) =>
-      defaultLetterLegendRows[Math.min(rowIndex, defaultLetterLegendRows.length - 1)]?.slice(0, row.length) ??
-      row.map(() => ''),
-    );
   const visibleNumberRow = numberRow ?? defaultNumberRow;
+  const visibleLetterRows = buildReferenceRows(rows);
 
   return (
-    <div className="px-1.5 py-2.5 sm:p-6" dir={direction} lang={lang}>
+    <div className="px-1.5 py-2.5 sm:p-6" dir="ltr" lang={lang}>
       <div className="space-y-1.5 sm:space-y-3">
         <div className="flex flex-wrap justify-center gap-1 sm:gap-1.5">
           {visibleNumberRow.map((keycap, keyIndex) => {
@@ -956,18 +1050,14 @@ function KeyboardReferenceCard({
           })}
         </div>
 
-        {legendRows.map((legendRow, rowIndex) => (
+        {visibleLetterRows.map((visibleRow, rowIndex) => (
           <div
             key={`${lang}-${rowIndex}`}
             className="flex flex-wrap justify-center gap-1 sm:gap-1.5"
           >
-            {legendRow.map((legend, keyIndex) => {
-              const keycap = rows[rowIndex]?.[keyIndex];
-              const main = typeof keycap === 'string' ? keycap : (keycap?.main ?? '');
-              const sub =
-                typeof keycap === 'string' ? legend : (keycap?.sub ?? legend ?? null);
+            {visibleRow.map(({ main, sub }, keyIndex) => {
               const hasMain = main.length > 0;
-              const insertValue = main || sub || '';
+              const insertValue = main || sub;
               const mainKeyClassName =
                 main.length > 4
                   ? `${mainKeyBaseClassName} text-[0.48rem] font-semibold leading-tight sm:text-[0.72rem]`
