@@ -4,7 +4,7 @@
 
 :root {
   color-scheme: light;
-  --page-background: #f5f4ef;
+  --page-background: #ffffff;
   --surface: #ffffff;
   --foreground: #111111;
   --muted: #5f5f5f;
@@ -18,8 +18,14 @@ body {
 
 body {
   font-family: var(--font-sans-base), var(--font-sans-hebrew), var(--font-sans-korean),
-    var(--font-sans-arabic), var(--font-sans-myanmar), var(--font-sans-ethiopic), ui-sans-serif,
-    system-ui, sans-serif;
+    var(--font-sans-arabic), var(--font-sans-myanmar), var(--font-sans-ethiopic),
+    var(--font-sans-chinese), var(--font-sans-japanese), var(--font-sans-thai),
+    var(--font-sans-armenian), var(--font-sans-georgian), var(--font-sans-gujarati),
+    var(--font-sans-devanagari), var(--font-sans-khmer), var(--font-serif-tibetan),
+    var(--font-sans-urdu), ui-sans-serif, system-ui, sans-serif;
+  background-color: var(--page-background);
+  background-image: radial-gradient(circle at 1px 1px, rgba(17, 17, 17, 0.06) 0.7px, transparent 0.8px);
+  background-size: 18px 18px;
   @apply antialiased;
 }
 

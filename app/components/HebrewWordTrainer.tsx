@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-type SoundEntry = {
-  symbol: string;
-  sounds: string[];
-};
+import { hebrewCommonWords } from '../data/hebrewWords';
 
 type Score = {
   correct: number;
@@ -13,14 +10,6 @@ type Score = {
 };
 
 const INITIAL_SCORE: Score = { correct: 0, incorrect: 0 };
-
-const formatSounds = (sounds: string[]) => sounds.join(' · ');
-
-type SoundTrainerProps = {
-  entries: SoundEntry[];
-  promptLabel: string;
-  instructionText: string;
-};
 
 const pickRandomIndex = (length: number, exclude?: number) => {
   let nextIndex = Math.floor(Math.random() * length);
@@ -34,43 +23,32 @@ const pickRandomIndex = (length: number, exclude?: number) => {
   return nextIndex;
 };
 
-const buildOptionSet = (entries: SoundEntry[], currentIndex: number) => {
+const buildOptionSet = (currentIndex: number) => {
   const options = new Set<string>();
-  options.add(formatSounds(entries[currentIndex].sounds));
+  options.add(hebrewCommonWords[currentIndex].translation);
 
   while (options.size < 4) {
-    const randomIndex = Math.floor(Math.random() * entries.length);
-    options.add(formatSounds(entries[randomIndex].sounds));
+    const randomIndex = Math.floor(Math.random() * hebrewCommonWords.length);
+    options.add(hebrewCommonWords[randomIndex].translation);
   }
 
-  return Array.from(options)
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 4);
+  return Array.from(options).sort(() => Math.random() - 0.5);
 };
 
-export default function SoundTrainer({
-  entries,
-  promptLabel,
-  instructionText,
-}: SoundTrainerProps) {
+export default function HebrewWordTrainer() {
   const [score, setScore] = useState<Score>(INITIAL_SCORE);
-  const [currentIndex, setCurrentIndex] = useState(() => pickRandomIndex(entries.length));
-  const [options, setOptions] = useState(() => buildOptionSet(entries, currentIndex));
+  const [currentIndex, setCurrentIndex] = useState(() => pickRandomIndex(hebrewCommonWords.length));
+  const [options, setOptions] = useState(() => buildOptionSet(currentIndex));
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
-  const correctOption = formatSounds(entries[currentIndex].sounds);
+  const currentWord = hebrewCommonWords[currentIndex];
   const totalAnswers = score.correct + score.incorrect;
-  const accuracy =
-    totalAnswers > 0 ? Math.round((score.correct / totalAnswers) * 100) : null;
+  const accuracy = totalAnswers > 0 ? Math.round((score.correct / totalAnswers) * 100) : null;
 
   useEffect(() => {
-    setOptions(buildOptionSet(entries, currentIndex));
+    setOptions(buildOptionSet(currentIndex));
     setSelectedOption(null);
-  }, [entries, currentIndex]);
-
-  const goToNextSymbol = () => {
-    setCurrentIndex(previous => pickRandomIndex(entries.length, previous));
-  };
+  }, [currentIndex]);
 
   useEffect(() => {
     if (!selectedOption) {
@@ -78,23 +56,28 @@ export default function SoundTrainer({
     }
 
     const timeout = window.setTimeout(() => {
-      setCurrentIndex(previous => pickRandomIndex(entries.length, previous));
+      setCurrentIndex(previous => pickRandomIndex(hebrewCommonWords.length, previous));
     }, 900);
 
-    return () => clearTimeout(timeout);
-  }, [entries.length, selectedOption]);
+    return () => window.clearTimeout(timeout);
+  }, [selectedOption]);
 
   const handleOptionClick = (option: string) => {
     if (selectedOption) {
       return;
     }
 
-    const isCorrect = option === correctOption;
+    const isCorrect = option === currentWord.translation;
+
     setSelectedOption(option);
     setScore(previous => ({
       correct: previous.correct + (isCorrect ? 1 : 0),
       incorrect: previous.incorrect + (isCorrect ? 0 : 1),
     }));
+  };
+
+  const goToNextWord = () => {
+    setCurrentIndex(previous => pickRandomIndex(hebrewCommonWords.length, previous));
   };
 
   const getOptionClassName = (option: string) => {
@@ -105,7 +88,7 @@ export default function SoundTrainer({
       return `${baseStyles} border-[var(--border)] text-zinc-700 hover:border-zinc-950 hover:text-zinc-950`;
     }
 
-    if (option === correctOption) {
+    if (option === currentWord.translation) {
       return `${baseStyles} border-zinc-950 bg-zinc-950 text-white`;
     }
 
@@ -121,11 +104,13 @@ export default function SoundTrainer({
       <section className="p-6 sm:p-8">
         <div className="flex flex-col gap-6">
           <div
-            className="border border-[var(--border)] p-8 text-center"
-            aria-label={`${promptLabel} ${entries[currentIndex].symbol}`}
+            dir="rtl"
+            lang="he"
+            className="min-h-[8rem] border border-[var(--border)] p-8 text-center"
+            aria-label={`Hebrew word ${currentWord.word}`}
           >
-            <div className="text-[5rem] font-medium leading-none text-zinc-950 sm:text-[6.5rem]">
-              {entries[currentIndex].symbol}
+            <div className="text-[3.75rem] font-medium leading-none text-zinc-950 sm:text-[5rem]">
+              {currentWord.word}
             </div>
           </div>
 
@@ -143,10 +128,10 @@ export default function SoundTrainer({
           </div>
 
           <div className="flex flex-col gap-4 border-t border-[var(--border)] pt-4 text-sm text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
-            <p>{instructionText}</p>
+            <p>Choose the English translation that matches the Hebrew word. The next card appears automatically.</p>
             <button
               type="button"
-              onClick={goToNextSymbol}
+              onClick={goToNextWord}
               className="inline-flex items-center justify-center border border-zinc-950 px-4 py-2 text-sm font-medium text-zinc-950 transition hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
             >
               Skip
@@ -157,6 +142,10 @@ export default function SoundTrainer({
 
       <aside className="border-t border-[var(--border)] p-5 lg:border-l lg:border-t-0 lg:pl-6">
         <div className="space-y-5 text-sm">
+          <div>
+            <p className="text-zinc-500">Words</p>
+            <p className="mt-1 text-2xl font-medium text-zinc-950">{hebrewCommonWords.length}</p>
+          </div>
           <div>
             <p className="text-zinc-500">Correct</p>
             <p className="mt-1 text-2xl font-medium text-zinc-950">{score.correct}</p>

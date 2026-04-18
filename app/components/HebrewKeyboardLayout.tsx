@@ -6,7 +6,7 @@ const keyboardRows = [
 
 export default function HebrewKeyboardLayout() {
   return (
-    <div className="border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-6">
+    <div className="p-4 sm:p-6">
       <div className="space-y-3">
         {keyboardRows.map(row => (
           <div key={row.join('')} className="flex flex-wrap justify-center gap-2">

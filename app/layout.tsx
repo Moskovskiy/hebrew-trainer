@@ -1,6 +1,23 @@
 import './globals.css';
 import { ReactNode } from 'react';
-import { Heebo, Noto_Naskh_Arabic, Noto_Sans, Noto_Sans_Ethiopic, Noto_Sans_KR, Noto_Sans_Myanmar } from 'next/font/google';
+import {
+  Heebo,
+  Noto_Naskh_Arabic,
+  Noto_Nastaliq_Urdu,
+  Noto_Sans,
+  Noto_Sans_Armenian,
+  Noto_Sans_Devanagari,
+  Noto_Sans_Ethiopic,
+  Noto_Sans_Georgian,
+  Noto_Sans_Gujarati,
+  Noto_Sans_JP,
+  Noto_Sans_KR,
+  Noto_Sans_Khmer,
+  Noto_Sans_Myanmar,
+  Noto_Sans_SC,
+  Noto_Sans_Thai,
+  Noto_Serif_Tibetan,
+} from 'next/font/google';
 
 const heebo = Heebo({
   subsets: ['latin', 'hebrew'],
@@ -38,17 +55,77 @@ const notoSansEthiopic = Noto_Sans_Ethiopic({
   variable: '--font-sans-ethiopic',
 });
 
+const notoSansSc = Noto_Sans_SC({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-sans-chinese',
+});
+
+const notoSansJp = Noto_Sans_JP({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-sans-japanese',
+});
+
+const notoSansThai = Noto_Sans_Thai({
+  subsets: ['thai'],
+  weight: ['400', '500', '700'],
+  variable: '--font-sans-thai',
+});
+
+const notoSansArmenian = Noto_Sans_Armenian({
+  subsets: ['armenian'],
+  weight: ['400', '500', '700'],
+  variable: '--font-sans-armenian',
+});
+
+const notoSansGeorgian = Noto_Sans_Georgian({
+  subsets: ['georgian'],
+  weight: ['400', '500', '700'],
+  variable: '--font-sans-georgian',
+});
+
+const notoSansGujarati = Noto_Sans_Gujarati({
+  subsets: ['gujarati'],
+  weight: ['400', '500', '700'],
+  variable: '--font-sans-gujarati',
+});
+
+const notoSansDevanagari = Noto_Sans_Devanagari({
+  subsets: ['devanagari'],
+  weight: ['400', '500', '700'],
+  variable: '--font-sans-devanagari',
+});
+
+const notoSansKhmer = Noto_Sans_Khmer({
+  subsets: ['khmer'],
+  weight: ['400', '500', '700'],
+  variable: '--font-sans-khmer',
+});
+
+const notoSerifTibetan = Noto_Serif_Tibetan({
+  subsets: ['tibetan'],
+  weight: ['400', '500', '700'],
+  variable: '--font-serif-tibetan',
+});
+
+const notoNastaliqUrdu = Noto_Nastaliq_Urdu({
+  subsets: ['arabic'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-sans-urdu',
+});
+
 export const metadata = {
   title: 'Script Trainer',
   description:
-    'Practice Hebrew, Korean, Russian, Ethiopian, Greek, Arabic, Farsi, and Myanmar in a clean minimalist interface.',
+    'Practice Hebrew, Chinese, Japanese, Korean, Russian, Ethiopian, Greek, Thai, Armenian, Georgian, Gujarati, Khmer, Sanskrit, Tibetan, Urdu, Marathi, Arabic, Farsi, and Myanmar in a clean minimalist interface.',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body
-        className={`${notoSans.variable} ${heebo.variable} ${notoSansKr.variable} ${notoNaskhArabic.variable} ${notoSansMyanmar.variable} ${notoSansEthiopic.variable} min-h-screen bg-[var(--page-background)] text-[var(--foreground)]`}
+        className={`${notoSans.variable} ${heebo.variable} ${notoSansKr.variable} ${notoNaskhArabic.variable} ${notoSansMyanmar.variable} ${notoSansEthiopic.variable} ${notoSansSc.variable} ${notoSansJp.variable} ${notoSansThai.variable} ${notoSansArmenian.variable} ${notoSansGeorgian.variable} ${notoSansGujarati.variable} ${notoSansDevanagari.variable} ${notoSansKhmer.variable} ${notoSerifTibetan.variable} ${notoNastaliqUrdu.variable} min-h-screen bg-[var(--page-background)] text-[var(--foreground)]`}
       >
         {children}
       </body>

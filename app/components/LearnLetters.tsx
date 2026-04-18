@@ -9,7 +9,7 @@ export default function LearnLetters() {
         return (
           <article
             key={letter.name}
-            className="border border-[var(--border)] bg-[var(--surface)] p-5"
+            className="border border-[var(--border)] p-5"
           >
             <div className="flex items-start justify-between gap-4">
               <div>

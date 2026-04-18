@@ -4,7 +4,28 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { type Language, randomSentence } from '../data/dictionaries';
 
 type TypingLanguage =
-  Extract<Language, 'hebrew' | 'korean' | 'russian' | 'ethiopian' | 'greek' | 'arabic' | 'farsi' | 'myanmar'>;
+  Extract<
+    Language,
+    | 'hebrew'
+    | 'chinese'
+    | 'japanese'
+    | 'korean'
+    | 'russian'
+    | 'ethiopian'
+    | 'greek'
+    | 'thai'
+    | 'armenian'
+    | 'georgian'
+    | 'gujarati'
+    | 'khmer'
+    | 'sanskrit'
+    | 'tibetan'
+    | 'urdu'
+    | 'marathi'
+    | 'arabic'
+    | 'farsi'
+    | 'myanmar'
+  >;
 
 const typingLanguageConfig: Record<
   TypingLanguage,
@@ -18,6 +39,16 @@ const typingLanguageConfig: Record<
     label: 'Hebrew',
     direction: 'rtl',
     htmlLang: 'he',
+  },
+  chinese: {
+    label: 'Chinese',
+    direction: 'ltr',
+    htmlLang: 'zh-Hans',
+  },
+  japanese: {
+    label: 'Japanese',
+    direction: 'ltr',
+    htmlLang: 'ja',
   },
   russian: {
     label: 'Russian',
@@ -38,6 +69,51 @@ const typingLanguageConfig: Record<
     label: 'Greek',
     direction: 'ltr',
     htmlLang: 'el',
+  },
+  thai: {
+    label: 'Thai',
+    direction: 'ltr',
+    htmlLang: 'th',
+  },
+  armenian: {
+    label: 'Armenian',
+    direction: 'ltr',
+    htmlLang: 'hy',
+  },
+  georgian: {
+    label: 'Georgian',
+    direction: 'ltr',
+    htmlLang: 'ka',
+  },
+  gujarati: {
+    label: 'Gujarati',
+    direction: 'ltr',
+    htmlLang: 'gu',
+  },
+  khmer: {
+    label: 'Khmer',
+    direction: 'ltr',
+    htmlLang: 'km',
+  },
+  sanskrit: {
+    label: 'Sanskrit',
+    direction: 'ltr',
+    htmlLang: 'sa',
+  },
+  tibetan: {
+    label: 'Tibetan',
+    direction: 'ltr',
+    htmlLang: 'bo',
+  },
+  urdu: {
+    label: 'Urdu',
+    direction: 'rtl',
+    htmlLang: 'ur',
+  },
+  marathi: {
+    label: 'Marathi',
+    direction: 'ltr',
+    htmlLang: 'mr',
   },
   myanmar: {
     label: 'Myanmar',
@@ -147,7 +223,7 @@ export default function TypingTrainer({ language }: { language: TypingLanguage }
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem]">
-      <section className="border border-[var(--border)] bg-[var(--surface)] p-6 sm:p-8">
+      <section className="p-6 sm:p-8">
         <div className="flex flex-col gap-6">
           <div
             dir={languageConfig.direction}
@@ -174,7 +250,7 @@ export default function TypingTrainer({ language }: { language: TypingLanguage }
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck={false}
-              className={`w-full border border-[var(--border)] bg-[var(--surface)] px-4 py-4 text-xl text-zinc-950 outline-none transition focus:border-zinc-950 ${
+              className={`w-full border border-[var(--border)] bg-transparent px-4 py-4 text-xl text-zinc-950 outline-none transition focus:border-zinc-950 ${
                 languageConfig.direction === 'rtl' ? 'text-right' : 'text-left'
               }`}
               aria-label={`Type the ${languageConfig.label} prompt`}
@@ -193,7 +269,7 @@ export default function TypingTrainer({ language }: { language: TypingLanguage }
         </div>
       </section>
 
-      <aside className="border border-[var(--border)] bg-[var(--surface)] p-5">
+      <aside className="border-t border-[var(--border)] p-5 lg:border-l lg:border-t-0 lg:pl-6">
         <div className="space-y-5 text-sm">
           <div>
             <p className="text-zinc-500">Completed</p>
