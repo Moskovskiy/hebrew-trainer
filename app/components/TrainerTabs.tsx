@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import HebrewLetterTrainer from './HebrewLetterTrainer';
 import KoreanLetterTrainer from './KoreanLetterTrainer';
@@ -10,7 +10,7 @@ import { arabicLetters, farsiLetters, greekLetters, russianLetters } from '../da
 
 export type StudyLanguage = 'hebrew' | 'korean' | 'russian' | 'greek' | 'arabic' | 'farsi';
 
-type TabValue = 'typing' | 'letters';
+export type TabValue = 'typing' | 'letters';
 
 const tabsByLanguage: Record<
   StudyLanguage,
@@ -90,14 +90,23 @@ const tabsByLanguage: Record<
   ],
 };
 
-export default function TrainerTabs({ language }: { language: StudyLanguage }) {
+export default function TrainerTabs({
+  language,
+  activeTab,
+  onTabChange,
+}: {
+  language: StudyLanguage;
+  activeTab: TabValue;
+  onTabChange: (tab: TabValue) => void;
+}) {
   const tabs = tabsByLanguage[language];
-  const [activeTab, setActiveTab] = useState<TabValue>(tabs[0].value);
   const activeTabDetails = tabs.find(tab => tab.value === activeTab) ?? tabs[0];
 
   useEffect(() => {
-    setActiveTab(tabs[0].value);
-  }, [language, tabs]);
+    if (!tabs.some(tab => tab.value === activeTab)) {
+      onTabChange(tabs[0].value);
+    }
+  }, [activeTab, onTabChange, tabs]);
 
   const renderContent = (value: TabValue) => {
     if (value === 'typing') {
@@ -177,7 +186,7 @@ export default function TrainerTabs({ language }: { language: StudyLanguage }) {
                     ? 'border-zinc-950 text-zinc-950'
                     : 'border-transparent text-zinc-500 hover:text-zinc-950'
                 }`}
-                onClick={() => setActiveTab(tab.value)}
+                onClick={() => onTabChange(tab.value)}
                 aria-selected={isActive}
                 role="tab"
                 tabIndex={isActive ? 0 : -1}
