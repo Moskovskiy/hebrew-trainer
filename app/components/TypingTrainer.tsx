@@ -3,7 +3,8 @@ import { ChangeEvent, useEffect, useState } from 'react';
 
 import { type Language, randomSentence } from '../data/dictionaries';
 
-type TypingLanguage = Extract<Language, 'hebrew' | 'russian' | 'greek' | 'arabic' | 'farsi'>;
+type TypingLanguage =
+  Extract<Language, 'hebrew' | 'korean' | 'russian' | 'greek' | 'arabic' | 'farsi'>;
 
 const typingLanguageConfig: Record<
   TypingLanguage,
@@ -22,6 +23,11 @@ const typingLanguageConfig: Record<
     label: 'Russian',
     direction: 'ltr',
     htmlLang: 'ru',
+  },
+  korean: {
+    label: 'Korean',
+    direction: 'ltr',
+    htmlLang: 'ko',
   },
   greek: {
     label: 'Greek',

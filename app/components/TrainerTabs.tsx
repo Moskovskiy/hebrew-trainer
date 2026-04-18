@@ -1,15 +1,16 @@
 'use client';
 
-import { type ComponentProps, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import HebrewLetterTrainer from './HebrewLetterTrainer';
 import KoreanLetterTrainer from './KoreanLetterTrainer';
+import SoundTrainer from './SoundTrainer';
 import TypingTrainer from './TypingTrainer';
+import { arabicLetters, farsiLetters, greekLetters, russianLetters } from '../data/scriptLetters';
 
 export type StudyLanguage = 'hebrew' | 'korean' | 'russian' | 'greek' | 'arabic' | 'farsi';
-type TypingLanguage = ComponentProps<typeof TypingTrainer>['language'];
 
-type TabValue = 'typing' | 'sounds';
+type TabValue = 'typing' | 'letters';
 
 const tabsByLanguage: Record<
   StudyLanguage,
@@ -18,53 +19,76 @@ const tabsByLanguage: Record<
   hebrew: [
     {
       value: 'typing',
-      label: 'Typing',
+      label: 'Keyboard Practice',
       description: 'Type generated Hebrew prompts and track your pace and accuracy.',
     },
     {
-      value: 'sounds',
-      label: 'Hebrew Sounds',
-      description: 'Match each letter to its common sound and build instant recall.',
+      value: 'letters',
+      label: 'Letter Practice',
+      description: 'Match each Hebrew letter to its common sound and build instant recall.',
     },
   ],
   korean: [
     {
-      value: 'sounds',
-      label: 'Korean Sounds',
-      description: 'Match Hangul letters to their common sounds and build instant recall.',
+      value: 'typing',
+      label: 'Keyboard Practice',
+      description: 'Type generated Korean prompts and build comfort with Hangul keyboard flow.',
+    },
+    {
+      value: 'letters',
+      label: 'Letter Practice',
+      description: 'Match each Hangul letter to its common sound and build instant recall.',
     },
   ],
   russian: [
     {
       value: 'typing',
-      label: 'Typing',
+      label: 'Keyboard Practice',
       description: 'Type generated Russian prompts in Cyrillic and track your pace and accuracy.',
+    },
+    {
+      value: 'letters',
+      label: 'Letter Practice',
+      description: 'Match Russian Cyrillic letters to their common pronunciations.',
     },
   ],
   greek: [
     {
       value: 'typing',
-      label: 'Typing',
+      label: 'Keyboard Practice',
       description: 'Type generated Greek prompts and build confidence with the modern Greek alphabet.',
+    },
+    {
+      value: 'letters',
+      label: 'Letter Practice',
+      description: 'Match Greek letters to their common pronunciations and reinforce quick recall.',
     },
   ],
   arabic: [
     {
       value: 'typing',
-      label: 'Typing',
+      label: 'Keyboard Practice',
       description: 'Type generated Arabic prompts right-to-left and practice steady script recognition.',
+    },
+    {
+      value: 'letters',
+      label: 'Letter Practice',
+      description: 'Match Arabic letters to their common sounds while staying oriented in right-to-left script.',
     },
   ],
   farsi: [
     {
       value: 'typing',
-      label: 'Typing',
+      label: 'Keyboard Practice',
       description: 'Type generated Farsi prompts right-to-left and get comfortable with Persian letterforms.',
+    },
+    {
+      value: 'letters',
+      label: 'Letter Practice',
+      description: 'Match Persian letters to their common sounds, including the characters unique to Farsi.',
     },
   ],
 };
-
-const isTypingLanguage = (language: StudyLanguage): language is TypingLanguage => language !== 'korean';
 
 export default function TrainerTabs({ language }: { language: StudyLanguage }) {
   const tabs = tabsByLanguage[language];
@@ -76,7 +100,7 @@ export default function TrainerTabs({ language }: { language: StudyLanguage }) {
   }, [language, tabs]);
 
   const renderContent = (value: TabValue) => {
-    if (value === 'typing' && isTypingLanguage(language)) {
+    if (value === 'typing') {
       return <TypingTrainer language={language} />;
     }
 
@@ -84,7 +108,53 @@ export default function TrainerTabs({ language }: { language: StudyLanguage }) {
       return <HebrewLetterTrainer />;
     }
 
-    return <KoreanLetterTrainer />;
+    if (language === 'korean') {
+      return <KoreanLetterTrainer />;
+    }
+
+    const letterPracticeByLanguage = {
+      russian: {
+        entries: russianLetters,
+        promptLabel: 'Russian letter',
+        instructionText:
+          'Choose the sound that best matches the Russian letter. The next card appears automatically.',
+      },
+      greek: {
+        entries: greekLetters,
+        promptLabel: 'Greek letter',
+        instructionText:
+          'Choose the sound that best matches the Greek letter. The next card appears automatically.',
+      },
+      arabic: {
+        entries: arabicLetters,
+        promptLabel: 'Arabic letter',
+        instructionText:
+          'Choose the sound that best matches the Arabic letter. The next card appears automatically.',
+      },
+      farsi: {
+        entries: farsiLetters,
+        promptLabel: 'Farsi letter',
+        instructionText:
+          'Choose the sound that best matches the Farsi letter. The next card appears automatically.',
+      },
+    } satisfies Record<
+      Exclude<StudyLanguage, 'hebrew' | 'korean'>,
+      {
+        entries: { symbol: string; sounds: string[] }[];
+        promptLabel: string;
+        instructionText: string;
+      }
+    >;
+
+    const practiceConfig = letterPracticeByLanguage[language];
+
+    return (
+      <SoundTrainer
+        entries={practiceConfig.entries}
+        promptLabel={practiceConfig.promptLabel}
+        instructionText={practiceConfig.instructionText}
+      />
+    );
   };
 
   return (
