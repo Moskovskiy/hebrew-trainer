@@ -1,18 +1,31 @@
 import './globals.css';
 import { ReactNode } from 'react';
+import { Heebo, Noto_Sans_KR } from 'next/font/google';
+
+const heebo = Heebo({
+  subsets: ['latin', 'hebrew'],
+  weight: ['400', '500', '700', '800'],
+  variable: '--font-sans-hebrew',
+});
+
+const notoSansKr = Noto_Sans_KR({
+  subsets: ['latin'],
+  weight: ['400', '500', '700', '800'],
+  variable: '--font-sans-korean',
+});
 
 export const metadata = {
-  title: 'Hebrew Letter Sound Trainer',
-  description: 'Learn the sounds of the Hebrew alphabet with an interactive quiz.',
+  title: 'Script Trainer',
+  description: 'Practice Hebrew and Korean sounds, plus Hebrew typing, in a clean minimalist interface.',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen w-full bg-slate-100/80 text-gray-900">
-        <div className="mx-auto flex min-h-screen w-full max-w-5xl items-stretch justify-center px-2 sm:px-6">
-          {children}
-        </div>
+      <body
+        className={`${heebo.variable} ${notoSansKr.variable} min-h-screen bg-[var(--page-background)] text-[var(--foreground)]`}
+      >
+        {children}
       </body>
     </html>
   );

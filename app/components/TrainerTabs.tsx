@@ -1,101 +1,107 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import HebrewLetterTrainer from './HebrewLetterTrainer';
-import LearnLetters from './LearnLetters';
+import KoreanLetterTrainer from './KoreanLetterTrainer';
 import TypingTrainer from './TypingTrainer';
 
-type TabValue = 'type-speed' | 'sound-match' | 'learn-letters';
+export type StudyLanguage = 'hebrew' | 'korean';
 
-const tabs: { value: TabValue; label: string; description: string }[] = [
-  {
-    value: 'type-speed',
-    label: 'Type Speed',
-    description: 'Sharpen your typing with multilingual sentences and accuracy tracking.',
-  },
-  {
-    value: 'sound-match',
-    label: 'Sound Match',
-    description: 'Match each sound to the right Hebrew letter and earn points.',
-  },
-  {
-    value: 'learn-letters',
-    label: 'Learn Letters',
-    description: 'Browse every Hebrew letter with its common sounds.',
-  },
-];
+type TabValue = 'typing' | 'sounds';
 
-export default function TrainerTabs() {
-  const [activeTab, setActiveTab] = useState<TabValue>('type-speed');
-  const baseButtonClasses =
-    'group flex-1 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 sm:min-w-[10rem]';
+const tabsByLanguage: Record<
+  StudyLanguage,
+  { value: TabValue; label: string; description: string }[]
+> = {
+  hebrew: [
+    {
+      value: 'typing',
+      label: 'Typing',
+      description: 'Type generated Hebrew prompts and track your pace and accuracy.',
+    },
+    {
+      value: 'sounds',
+      label: 'Hebrew Sounds',
+      description: 'Match each letter to its common sound and build instant recall.',
+    },
+  ],
+  korean: [
+    {
+      value: 'sounds',
+      label: 'Korean Sounds',
+      description: 'Match Hangul letters to their common sounds and build instant recall.',
+    },
+  ],
+};
+
+export default function TrainerTabs({ language }: { language: StudyLanguage }) {
+  const tabs = tabsByLanguage[language];
+  const [activeTab, setActiveTab] = useState<TabValue>(tabs[0].value);
+  const activeTabDetails = tabs.find(tab => tab.value === activeTab) ?? tabs[0];
+
+  useEffect(() => {
+    setActiveTab(tabs[0].value);
+  }, [language, tabs]);
 
   const renderContent = (value: TabValue) => {
-    switch (value) {
-      case 'type-speed':
-        return <TypingTrainer />;
-      case 'sound-match':
-        return <HebrewLetterTrainer />;
-      case 'learn-letters':
-      default:
-        return <LearnLetters />;
+    if (language === 'hebrew') {
+      switch (value) {
+        case 'typing':
+          return <TypingTrainer />;
+        case 'sounds':
+        default:
+          return <HebrewLetterTrainer />;
+      }
     }
+
+    return <KoreanLetterTrainer />;
   };
 
   return (
-    <div className="flex w-full flex-col gap-6">
-      <div className="order-1 sm:order-2">
-        {tabs.map(tab => (
-          <div
-            key={tab.value}
-            role="tabpanel"
-            id={`trainer-tabpanel-${tab.value}`}
-            aria-labelledby={`trainer-tab-${tab.value}`}
-            hidden={activeTab !== tab.value}
-          >
-            {renderContent(tab.value)}
-          </div>
-        ))}
+    <div className="flex w-full flex-col gap-8">
+      {tabs.length > 1 ? (
+        <nav
+          className="flex gap-6 overflow-x-auto border-b border-[var(--border)]"
+          role="tablist"
+          aria-label={`${language} trainer exercises`}
+        >
+          {tabs.map(tab => {
+            const isActive = tab.value === activeTab;
+
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                className={`border-b-2 pb-4 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 ${
+                  isActive
+                    ? 'border-zinc-950 text-zinc-950'
+                    : 'border-transparent text-zinc-500 hover:text-zinc-950'
+                }`}
+                onClick={() => setActiveTab(tab.value)}
+                aria-selected={isActive}
+                role="tab"
+                tabIndex={isActive ? 0 : -1}
+                id={`trainer-tab-${language}-${tab.value}`}
+                aria-controls={`trainer-tabpanel-${language}-${tab.value}`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </nav>
+      ) : null}
+
+      <div className="max-w-2xl">
+        <p className="text-sm leading-7 text-zinc-600">{activeTabDetails.description}</p>
       </div>
 
-      <div className="order-2 sm:order-1">
-        <div className="mx-auto w-full max-w-xl">
-          <div className="rounded-3xl border border-slate-200/70 bg-white/80 p-2 shadow-lg shadow-slate-900/5 backdrop-blur">
-            <nav
-              className="grid grid-cols-3 gap-2 sm:flex"
-              role="tablist"
-              aria-label="Hebrew trainer modes"
-            >
-              {tabs.map(tab => {
-                const isActive = tab.value === activeTab;
-
-                return (
-                  <button
-                    key={tab.value}
-                    type="button"
-                    className={`${baseButtonClasses} ${
-                      isActive
-                        ? 'bg-slate-900 text-white shadow-md shadow-slate-900/25'
-                        : 'bg-transparent text-slate-600 hover:bg-slate-100/80 hover:text-slate-900'
-                    }`}
-                    onClick={() => setActiveTab(tab.value)}
-                    aria-selected={isActive}
-                    role="tab"
-                    tabIndex={isActive ? 0 : -1}
-                    id={`trainer-tab-${tab.value}`}
-                    aria-controls={`trainer-tabpanel-${tab.value}`}
-                  >
-                    <div className="text-base font-semibold">{tab.label}</div>
-                    <p className="mt-1 text-xs font-medium text-slate-400 transition-colors group-hover:text-slate-500">
-                      {tab.description}
-                    </p>
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </div>
+      <div
+        role="tabpanel"
+        id={`trainer-tabpanel-${language}-${activeTab}`}
+        aria-labelledby={`trainer-tab-${language}-${activeTab}`}
+      >
+        {renderContent(activeTab)}
       </div>
     </div>
   );

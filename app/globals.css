@@ -2,11 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: light;
+  --page-background: #f5f4ef;
+  --surface: #ffffff;
+  --foreground: #111111;
+  --muted: #5f5f5f;
+  --border: #d4d4d0;
+}
+
 html,
 body {
   @apply min-h-screen;
 }
 
 body {
-  @apply bg-gradient-to-br from-indigo-100 via-white to-emerald-100 text-gray-900 antialiased;
+  font-family: var(--font-sans-hebrew), var(--font-sans-korean), ui-sans-serif, system-ui, sans-serif;
+  @apply antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: #111111;
+  color: #ffffff;
 }
