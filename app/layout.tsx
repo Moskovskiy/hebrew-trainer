@@ -1,11 +1,17 @@
 import './globals.css';
 import { ReactNode } from 'react';
-import { Heebo, Noto_Sans_KR } from 'next/font/google';
+import { Heebo, Noto_Naskh_Arabic, Noto_Sans, Noto_Sans_KR } from 'next/font/google';
 
 const heebo = Heebo({
   subsets: ['latin', 'hebrew'],
   weight: ['400', '500', '700', '800'],
   variable: '--font-sans-hebrew',
+});
+
+const notoSans = Noto_Sans({
+  subsets: ['latin', 'cyrillic', 'greek'],
+  weight: ['400', '500', '700', '800'],
+  variable: '--font-sans-base',
 });
 
 const notoSansKr = Noto_Sans_KR({
@@ -14,16 +20,23 @@ const notoSansKr = Noto_Sans_KR({
   variable: '--font-sans-korean',
 });
 
+const notoNaskhArabic = Noto_Naskh_Arabic({
+  subsets: ['arabic'],
+  weight: ['400', '500', '700'],
+  variable: '--font-sans-arabic',
+});
+
 export const metadata = {
   title: 'Script Trainer',
-  description: 'Practice Hebrew and Korean sounds, plus Hebrew typing, in a clean minimalist interface.',
+  description:
+    'Practice Hebrew, Korean, Russian, Greek, Arabic, and Farsi scripts in a clean minimalist interface.',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body
-        className={`${heebo.variable} ${notoSansKr.variable} min-h-screen bg-[var(--page-background)] text-[var(--foreground)]`}
+        className={`${notoSans.variable} ${heebo.variable} ${notoSansKr.variable} ${notoNaskhArabic.variable} min-h-screen bg-[var(--page-background)] text-[var(--foreground)]`}
       >
         {children}
       </body>

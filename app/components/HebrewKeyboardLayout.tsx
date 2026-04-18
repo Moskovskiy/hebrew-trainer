@@ -8,13 +8,8 @@ export default function HebrewKeyboardLayout() {
   return (
     <div className="border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-6">
       <div className="space-y-3">
-        {keyboardRows.map((row, rowIndex) => (
-          <div
-            key={row.join('')}
-            className={`flex flex-wrap gap-2 ${
-              rowIndex === 1 ? 'sm:pl-6' : rowIndex === 2 ? 'sm:pl-12' : ''
-            }`}
-          >
+        {keyboardRows.map(row => (
+          <div key={row.join('')} className="flex flex-wrap justify-center gap-2">
             {row.map(key => (
               <div
                 key={key}
@@ -27,11 +22,11 @@ export default function HebrewKeyboardLayout() {
           </div>
         ))}
 
-        <div className="flex items-center gap-2 pt-2 sm:pl-16">
+        <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
           <div className="flex h-12 w-24 items-center justify-center border border-[var(--border)] text-xs uppercase tracking-[0.2em] text-zinc-500">
             Shift
           </div>
-          <div className="flex h-12 min-w-[12rem] flex-1 items-center justify-center border border-[var(--border)] text-xs uppercase tracking-[0.2em] text-zinc-500">
+          <div className="flex h-12 min-w-[12rem] items-center justify-center border border-[var(--border)] px-6 text-xs uppercase tracking-[0.2em] text-zinc-500 sm:min-w-[18rem]">
             Space
           </div>
           <div className="flex h-12 w-24 items-center justify-center border border-[var(--border)] text-xs uppercase tracking-[0.2em] text-zinc-500">

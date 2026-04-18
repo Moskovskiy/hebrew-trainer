@@ -17,7 +17,8 @@ body {
 }
 
 body {
-  font-family: var(--font-sans-hebrew), var(--font-sans-korean), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans-base), var(--font-sans-hebrew), var(--font-sans-korean),
+    var(--font-sans-arabic), ui-sans-serif, system-ui, sans-serif;
   @apply antialiased;
 }
 

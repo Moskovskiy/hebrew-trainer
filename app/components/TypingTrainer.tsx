@@ -1,13 +1,60 @@
 'use client';
 import { ChangeEvent, useEffect, useState } from 'react';
 
-import { randomSentence } from '../data/dictionaries';
+import { type Language, randomSentence } from '../data/dictionaries';
 
-const createPrompt = () => randomSentence('hebrew');
+type TypingLanguage = Extract<Language, 'hebrew' | 'russian' | 'greek' | 'arabic' | 'farsi'>;
 
-export default function TypingTrainer() {
+const typingLanguageConfig: Record<
+  TypingLanguage,
+  {
+    label: string;
+    direction: 'ltr' | 'rtl';
+    htmlLang: string;
+  }
+> = {
+  hebrew: {
+    label: 'Hebrew',
+    direction: 'rtl',
+    htmlLang: 'he',
+  },
+  russian: {
+    label: 'Russian',
+    direction: 'ltr',
+    htmlLang: 'ru',
+  },
+  greek: {
+    label: 'Greek',
+    direction: 'ltr',
+    htmlLang: 'el',
+  },
+  arabic: {
+    label: 'Arabic',
+    direction: 'rtl',
+    htmlLang: 'ar',
+  },
+  farsi: {
+    label: 'Farsi',
+    direction: 'rtl',
+    htmlLang: 'fa',
+  },
+};
+
+const normalizePromptForTyping = (language: TypingLanguage, prompt: string) => {
+  const withoutArabicDiacritics = prompt.replace(/[\u064b-\u065f\u0670]/g, '');
+  const withoutHalfSpaces =
+    language === 'farsi' ? withoutArabicDiacritics.replace(/\u200c/g, ' ') : withoutArabicDiacritics;
+
+  return withoutHalfSpaces.replace(/\s+/g, ' ').trim();
+};
+
+const createPrompt = (language: TypingLanguage) =>
+  normalizePromptForTyping(language, randomSentence(language));
+
+export default function TypingTrainer({ language }: { language: TypingLanguage }) {
+  const languageConfig = typingLanguageConfig[language];
   const [promptKey, setPromptKey] = useState(0);
-  const [prompt, setPrompt] = useState(() => createPrompt());
+  const [prompt, setPrompt] = useState(() => createPrompt(language));
   const [input, setInput] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
   const [mistakes, setMistakes] = useState(0);
@@ -16,11 +63,17 @@ export default function TypingTrainer() {
   const [lastAccuracy, setLastAccuracy] = useState<number | null>(null);
 
   useEffect(() => {
-    setPrompt(createPrompt());
+    setPrompt(createPrompt(language));
     setInput('');
     setStartTime(null);
     setMistakes(0);
-  }, [promptKey]);
+  }, [language, promptKey]);
+
+  useEffect(() => {
+    setCompletedPrompts(0);
+    setLastSpeed(null);
+    setLastAccuracy(null);
+  }, [language]);
 
   const moveToNextPrompt = () => {
     setPromptKey(current => current + 1);
@@ -81,8 +134,11 @@ export default function TypingTrainer() {
       <section className="border border-[var(--border)] bg-[var(--surface)] p-6 sm:p-8">
         <div className="flex flex-col gap-6">
           <div
-            dir="rtl"
-            className="min-h-[7rem] border border-[var(--border)] p-6 text-2xl leading-loose tracking-[0.03em] text-zinc-950 sm:text-3xl"
+            dir={languageConfig.direction}
+            lang={languageConfig.htmlLang}
+            className={`min-h-[7rem] border border-[var(--border)] p-6 text-2xl leading-loose tracking-[0.03em] text-zinc-950 sm:text-3xl ${
+              languageConfig.direction === 'rtl' ? 'text-right' : 'text-left'
+            }`}
           >
             {prompt.split('').map((char, idx) => (
               <span key={idx} className={getCharClass(char, idx)}>
@@ -97,21 +153,24 @@ export default function TypingTrainer() {
             </span>
             <input
               type="text"
-              dir="rtl"
+              dir={languageConfig.direction}
+              lang={languageConfig.htmlLang}
               autoFocus
               value={input}
               onChange={handleChange}
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck={false}
-              className="w-full border border-[var(--border)] bg-[var(--surface)] px-4 py-4 text-xl text-zinc-950 outline-none transition focus:border-zinc-950"
-              placeholder="הקלידו כאן"
-              aria-label="Type the Hebrew prompt"
+              className={`w-full border border-[var(--border)] bg-[var(--surface)] px-4 py-4 text-xl text-zinc-950 outline-none transition focus:border-zinc-950 ${
+                languageConfig.direction === 'rtl' ? 'text-right' : 'text-left'
+              }`}
+              placeholder="Start typing here"
+              aria-label={`Type the ${languageConfig.label} prompt`}
             />
           </label>
 
           <div className="flex flex-col gap-4 border-t border-[var(--border)] pt-4 text-sm text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
-            <p>Finish the line to load the next Hebrew prompt automatically.</p>
+            <p>Finish the line to load the next {languageConfig.label} prompt automatically.</p>
             <button
               type="button"
               onClick={moveToNextPrompt}

@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { type ComponentProps, useEffect, useState } from 'react';
 
 import HebrewLetterTrainer from './HebrewLetterTrainer';
 import KoreanLetterTrainer from './KoreanLetterTrainer';
 import TypingTrainer from './TypingTrainer';
 
-export type StudyLanguage = 'hebrew' | 'korean';
+export type StudyLanguage = 'hebrew' | 'korean' | 'russian' | 'greek' | 'arabic' | 'farsi';
+type TypingLanguage = ComponentProps<typeof TypingTrainer>['language'];
 
 type TabValue = 'typing' | 'sounds';
 
@@ -33,7 +34,37 @@ const tabsByLanguage: Record<
       description: 'Match Hangul letters to their common sounds and build instant recall.',
     },
   ],
+  russian: [
+    {
+      value: 'typing',
+      label: 'Typing',
+      description: 'Type generated Russian prompts in Cyrillic and track your pace and accuracy.',
+    },
+  ],
+  greek: [
+    {
+      value: 'typing',
+      label: 'Typing',
+      description: 'Type generated Greek prompts and build confidence with the modern Greek alphabet.',
+    },
+  ],
+  arabic: [
+    {
+      value: 'typing',
+      label: 'Typing',
+      description: 'Type generated Arabic prompts right-to-left and practice steady script recognition.',
+    },
+  ],
+  farsi: [
+    {
+      value: 'typing',
+      label: 'Typing',
+      description: 'Type generated Farsi prompts right-to-left and get comfortable with Persian letterforms.',
+    },
+  ],
 };
+
+const isTypingLanguage = (language: StudyLanguage): language is TypingLanguage => language !== 'korean';
 
 export default function TrainerTabs({ language }: { language: StudyLanguage }) {
   const tabs = tabsByLanguage[language];
@@ -45,14 +76,12 @@ export default function TrainerTabs({ language }: { language: StudyLanguage }) {
   }, [language, tabs]);
 
   const renderContent = (value: TabValue) => {
+    if (value === 'typing' && isTypingLanguage(language)) {
+      return <TypingTrainer language={language} />;
+    }
+
     if (language === 'hebrew') {
-      switch (value) {
-        case 'typing':
-          return <TypingTrainer />;
-        case 'sounds':
-        default:
-          return <HebrewLetterTrainer />;
-      }
+      return <HebrewLetterTrainer />;
     }
 
     return <KoreanLetterTrainer />;
