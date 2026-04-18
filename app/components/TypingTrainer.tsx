@@ -306,6 +306,12 @@ export default function TypingTrainer({
   }, [language]);
 
   useEffect(() => {
+    window.requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+  }, [language]);
+
+  useEffect(() => {
     onStatsChange?.([
       { label: 'Completed', value: completedPrompts },
       { label: 'Mistakes', value: mistakes },

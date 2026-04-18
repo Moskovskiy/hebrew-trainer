@@ -1137,7 +1137,7 @@ function KeyboardReferenceCard({
   }, [lang]);
 
   return (
-    <div className="px-1.5 py-2.5 sm:p-6" dir="ltr" lang={lang}>
+    <div className="px-0 py-2.5 sm:p-6" dir="ltr" lang={lang}>
       <div className="space-y-1.5 sm:space-y-3">
         <div className="flex flex-wrap justify-center gap-1 sm:gap-1.5">
           {visibleNumberRow.map((keycap, keyIndex) => {
@@ -1351,7 +1351,7 @@ export default function LanguageWorkspace() {
             />
 
             {activeTab === 'typing' && activeOption.referenceContent ? (
-              <section className="lg:rounded-[2rem] lg:border lg:border-[var(--border)]">
+              <section className="-mx-4 lg:mx-0 lg:rounded-[2rem] lg:border lg:border-[var(--border)]">
                 {activeOption.referenceContent}
               </section>
             ) : null}
