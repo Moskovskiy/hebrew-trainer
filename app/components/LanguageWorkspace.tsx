@@ -35,18 +35,18 @@ const languageOptions: {
   {
     value: 'russian',
     label: 'Russian',
-    referenceEyebrow: 'Alphabet reference',
-    referenceHeading: 'Keep the Cyrillic alphabet visible while you practice Russian prompts.',
+    referenceEyebrow: 'Keyboard layout',
+    referenceHeading: 'Keep the Russian keyboard visible while you practice.',
     referenceDescription:
-      'Russian runs left to right. These common uppercase letters make it easier to stay oriented while you switch between keyboard layouts.',
+      'Russian typing uses the standard JCUKEN layout, not QWERTY. Keeping the key positions in view makes the keyboard drill much more useful.',
     referenceContent: (
-      <ScriptReferenceCard
+      <KeyboardReferenceCard
         direction="ltr"
         lang="ru"
         rows={[
-          ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й'],
-          ['К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф'],
-          ['Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'],
+          ['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ'],
+          ['ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э'],
+          ['я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю'],
         ]}
       />
     ),
@@ -54,18 +54,18 @@ const languageOptions: {
   {
     value: 'greek',
     label: 'Greek',
-    referenceEyebrow: 'Alphabet reference',
-    referenceHeading: 'Keep the Greek alphabet nearby while you practice.',
+    referenceEyebrow: 'Keyboard layout',
+    referenceHeading: 'Keep the Greek keyboard visible while you practice.',
     referenceDescription:
-      'Greek runs left to right. A quick visual pass over the uppercase forms helps when you are switching between Latin and Greek keyboard layouts.',
+      'Modern Greek uses its own key arrangement, with final sigma and accent keys in different spots from Latin keyboards. A visible layout helps you build real keyboard memory.',
     referenceContent: (
-      <ScriptReferenceCard
+      <KeyboardReferenceCard
         direction="ltr"
         lang="el"
         rows={[
-          ['Α', 'Β', 'Γ', 'Δ', 'Ε', 'Ζ', 'Η', 'Θ'],
-          ['Ι', 'Κ', 'Λ', 'Μ', 'Ν', 'Ξ', 'Ο', 'Π'],
-          ['Ρ', 'Σ', 'Τ', 'Υ', 'Φ', 'Χ', 'Ψ', 'Ω'],
+          ['ς', 'ε', 'ρ', 'τ', 'υ', 'θ', 'ι', 'ο', 'π'],
+          ['α', 'σ', 'δ', 'φ', 'γ', 'η', 'ξ', 'κ', 'λ'],
+          ['ζ', 'χ', 'ψ', 'ω', 'β', 'ν', 'μ'],
         ]}
       />
     ),
@@ -73,18 +73,18 @@ const languageOptions: {
   {
     value: 'arabic',
     label: 'Arabic',
-    referenceEyebrow: 'Script reference',
-    referenceHeading: 'Keep the Arabic script visible while you practice right-to-left.',
+    referenceEyebrow: 'Keyboard layout',
+    referenceHeading: 'Keep the Arabic keyboard visible while you practice right-to-left.',
     referenceDescription:
-      'Arabic prompts read from right to left. These core letters give you a quick visual anchor while you settle into the script flow.',
+      'Arabic typing follows the standard Arabic 101 layout. Seeing the key positions matters more than seeing the alphabet in order during keyboard practice.',
     referenceContent: (
-      <ScriptReferenceCard
+      <KeyboardReferenceCard
         direction="rtl"
         lang="ar"
         rows={[
-          ['ا', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ'],
-          ['ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع'],
-          ['غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي'],
+          ['ض', 'ص', 'ث', 'ق', 'ف', 'غ', 'ع', 'ه', 'خ', 'ح'],
+          ['ش', 'س', 'ي', 'ب', 'ل', 'ا', 'ت', 'ن', 'م', 'ك'],
+          ['ئ', 'ء', 'ؤ', 'ر', 'ى', 'ة', 'و', 'ز', 'ظ', 'ط'],
         ]}
       />
     ),
@@ -92,26 +92,25 @@ const languageOptions: {
   {
     value: 'farsi',
     label: 'Farsi',
-    referenceEyebrow: 'Script reference',
-    referenceHeading: 'Keep the Persian alphabet visible while you practice right-to-left.',
+    referenceEyebrow: 'Keyboard layout',
+    referenceHeading: 'Keep the Persian keyboard visible while you practice right-to-left.',
     referenceDescription:
-      'Farsi uses the Arabic script plus Persian letters like پ, چ, ژ, and گ. Keeping the full set nearby makes the typing drill easier to trust.',
+      'Farsi typing uses the Persian standard keyboard, including letters like پ, چ, ژ, and گ in fixed key positions. This is more useful here than an alphabet reference.',
     referenceContent: (
-      <ScriptReferenceCard
+      <KeyboardReferenceCard
         direction="rtl"
         lang="fa"
         rows={[
-          ['ا', 'ب', 'پ', 'ت', 'ث', 'ج', 'چ', 'ح', 'خ'],
-          ['د', 'ذ', 'ر', 'ز', 'ژ', 'س', 'ش', 'ص', 'ض'],
-          ['ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ک', 'گ', 'ل'],
-          ['م', 'ن', 'و', 'ه', 'ی'],
+          ['ض', 'ص', 'ث', 'ق', 'ف', 'غ', 'ع', 'ه', 'خ', 'ح', 'ج', 'چ'],
+          ['ش', 'س', 'ی', 'ب', 'ل', 'ا', 'ت', 'ن', 'م', 'ک', 'گ'],
+          ['ظ', 'ط', 'ز', 'ر', 'ذ', 'د', 'پ', 'و'],
         ]}
       />
     ),
   },
 ];
 
-function ScriptReferenceCard({
+function KeyboardReferenceCard({
   direction,
   lang,
   rows,
@@ -135,6 +134,18 @@ function ScriptReferenceCard({
             ))}
           </div>
         ))}
+
+        <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+          <div className="flex h-12 w-24 items-center justify-center border border-[var(--border)] text-xs uppercase tracking-[0.2em] text-zinc-500">
+            Shift
+          </div>
+          <div className="flex h-12 min-w-[12rem] items-center justify-center border border-[var(--border)] px-6 text-xs uppercase tracking-[0.2em] text-zinc-500 sm:min-w-[18rem]">
+            Space
+          </div>
+          <div className="flex h-12 w-24 items-center justify-center border border-[var(--border)] text-xs uppercase tracking-[0.2em] text-zinc-500">
+            Enter
+          </div>
+        </div>
       </div>
     </div>
   );
