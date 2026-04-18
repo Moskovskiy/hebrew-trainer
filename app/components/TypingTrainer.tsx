@@ -4,7 +4,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { type Language, randomSentence } from '../data/dictionaries';
 
 type TypingLanguage =
-  Extract<Language, 'hebrew' | 'korean' | 'russian' | 'greek' | 'arabic' | 'farsi'>;
+  Extract<Language, 'hebrew' | 'korean' | 'russian' | 'ethiopian' | 'greek' | 'arabic' | 'farsi' | 'myanmar'>;
 
 const typingLanguageConfig: Record<
   TypingLanguage,
@@ -29,10 +29,20 @@ const typingLanguageConfig: Record<
     direction: 'ltr',
     htmlLang: 'ko',
   },
+  ethiopian: {
+    label: 'Ethiopian',
+    direction: 'ltr',
+    htmlLang: 'am',
+  },
   greek: {
     label: 'Greek',
     direction: 'ltr',
     htmlLang: 'el',
+  },
+  myanmar: {
+    label: 'Myanmar',
+    direction: 'ltr',
+    htmlLang: 'my',
   },
   arabic: {
     label: 'Arabic',
@@ -153,10 +163,7 @@ export default function TypingTrainer({ language }: { language: TypingLanguage }
             ))}
           </div>
 
-          <label className="flex flex-col gap-2">
-            <span className="text-[0.72rem] uppercase tracking-[0.28em] text-zinc-500">
-              Your typing
-            </span>
+          <label>
             <input
               type="text"
               dir={languageConfig.direction}
@@ -170,13 +177,11 @@ export default function TypingTrainer({ language }: { language: TypingLanguage }
               className={`w-full border border-[var(--border)] bg-[var(--surface)] px-4 py-4 text-xl text-zinc-950 outline-none transition focus:border-zinc-950 ${
                 languageConfig.direction === 'rtl' ? 'text-right' : 'text-left'
               }`}
-              placeholder="Start typing here"
               aria-label={`Type the ${languageConfig.label} prompt`}
             />
           </label>
 
-          <div className="flex flex-col gap-4 border-t border-[var(--border)] pt-4 text-sm text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
-            <p>Finish the line to load the next {languageConfig.label} prompt automatically.</p>
+          <div className="flex justify-end border-t border-[var(--border)] pt-4">
             <button
               type="button"
               onClick={moveToNextPrompt}

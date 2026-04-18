@@ -1,18 +1,16 @@
 'use client';
 
-import { useEffect } from 'react';
-
 import HebrewLetterTrainer from './HebrewLetterTrainer';
 import KoreanLetterTrainer from './KoreanLetterTrainer';
 import SoundTrainer from './SoundTrainer';
 import TypingTrainer from './TypingTrainer';
-import { arabicLetters, farsiLetters, greekLetters, russianLetters } from '../data/scriptLetters';
+import { arabicLetters, ethiopianLetters, farsiLetters, greekLetters, myanmarLetters, russianLetters } from '../data/scriptLetters';
 
-export type StudyLanguage = 'hebrew' | 'korean' | 'russian' | 'greek' | 'arabic' | 'farsi';
+export type StudyLanguage = 'hebrew' | 'korean' | 'russian' | 'ethiopian' | 'greek' | 'arabic' | 'farsi' | 'myanmar';
 
 export type TabValue = 'typing' | 'letters';
 
-const tabsByLanguage: Record<
+export const tabsByLanguage: Record<
   StudyLanguage,
   { value: TabValue; label: string; description: string }[]
 > = {
@@ -24,7 +22,7 @@ const tabsByLanguage: Record<
     },
     {
       value: 'letters',
-      label: 'Letter Practice',
+      label: 'Sound Practice',
       description: 'Match each Hebrew letter to its common sound and build instant recall.',
     },
   ],
@@ -36,7 +34,7 @@ const tabsByLanguage: Record<
     },
     {
       value: 'letters',
-      label: 'Letter Practice',
+      label: 'Sound Practice',
       description: 'Match each Hangul letter to its common sound and build instant recall.',
     },
   ],
@@ -48,8 +46,20 @@ const tabsByLanguage: Record<
     },
     {
       value: 'letters',
-      label: 'Letter Practice',
+      label: 'Sound Practice',
       description: 'Match Russian Cyrillic letters to their common pronunciations.',
+    },
+  ],
+  ethiopian: [
+    {
+      value: 'typing',
+      label: 'Keyboard Practice',
+      description: 'Type generated Ethiopian prompts with a mnemonic Ethiopic keyboard layout.',
+    },
+    {
+      value: 'letters',
+      label: 'Sound Practice',
+      description: 'Match common Ethiopic letters to their usual sounds.',
     },
   ],
   greek: [
@@ -60,8 +70,20 @@ const tabsByLanguage: Record<
     },
     {
       value: 'letters',
-      label: 'Letter Practice',
+      label: 'Sound Practice',
       description: 'Match Greek letters to their common pronunciations and reinforce quick recall.',
+    },
+  ],
+  myanmar: [
+    {
+      value: 'typing',
+      label: 'Keyboard Practice',
+      description: 'Type generated Myanmar prompts and practice on the standard Burmese keyboard layout.',
+    },
+    {
+      value: 'letters',
+      label: 'Sound Practice',
+      description: 'Match common Myanmar letters to their usual sounds and build script recall.',
     },
   ],
   arabic: [
@@ -72,7 +94,7 @@ const tabsByLanguage: Record<
     },
     {
       value: 'letters',
-      label: 'Letter Practice',
+      label: 'Sound Practice',
       description: 'Match Arabic letters to their common sounds while staying oriented in right-to-left script.',
     },
   ],
@@ -84,7 +106,7 @@ const tabsByLanguage: Record<
     },
     {
       value: 'letters',
-      label: 'Letter Practice',
+      label: 'Sound Practice',
       description: 'Match Persian letters to their common sounds, including the characters unique to Farsi.',
     },
   ],
@@ -93,21 +115,10 @@ const tabsByLanguage: Record<
 export default function TrainerTabs({
   language,
   activeTab,
-  onTabChange,
 }: {
   language: StudyLanguage;
   activeTab: TabValue;
-  onTabChange: (tab: TabValue) => void;
 }) {
-  const tabs = tabsByLanguage[language];
-  const activeTabDetails = tabs.find(tab => tab.value === activeTab) ?? tabs[0];
-
-  useEffect(() => {
-    if (!tabs.some(tab => tab.value === activeTab)) {
-      onTabChange(tabs[0].value);
-    }
-  }, [activeTab, onTabChange, tabs]);
-
   const renderContent = (value: TabValue) => {
     if (value === 'typing') {
       return <TypingTrainer language={language} />;
@@ -128,11 +139,23 @@ export default function TrainerTabs({
         instructionText:
           'Choose the sound that best matches the Russian letter. The next card appears automatically.',
       },
+      ethiopian: {
+        entries: ethiopianLetters,
+        promptLabel: 'Ethiopian letter',
+        instructionText:
+          'Choose the sound that best matches the Ethiopian letter. The next card appears automatically.',
+      },
       greek: {
         entries: greekLetters,
         promptLabel: 'Greek letter',
         instructionText:
           'Choose the sound that best matches the Greek letter. The next card appears automatically.',
+      },
+      myanmar: {
+        entries: myanmarLetters,
+        promptLabel: 'Myanmar letter',
+        instructionText:
+          'Choose the sound that best matches the Myanmar letter. The next card appears automatically.',
       },
       arabic: {
         entries: arabicLetters,
@@ -167,43 +190,7 @@ export default function TrainerTabs({
   };
 
   return (
-    <div className="flex w-full flex-col gap-8">
-      {tabs.length > 1 ? (
-        <nav
-          className="flex gap-6 overflow-x-auto border-b border-[var(--border)]"
-          role="tablist"
-          aria-label={`${language} trainer exercises`}
-        >
-          {tabs.map(tab => {
-            const isActive = tab.value === activeTab;
-
-            return (
-              <button
-                key={tab.value}
-                type="button"
-                className={`border-b-2 pb-4 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 ${
-                  isActive
-                    ? 'border-zinc-950 text-zinc-950'
-                    : 'border-transparent text-zinc-500 hover:text-zinc-950'
-                }`}
-                onClick={() => onTabChange(tab.value)}
-                aria-selected={isActive}
-                role="tab"
-                tabIndex={isActive ? 0 : -1}
-                id={`trainer-tab-${language}-${tab.value}`}
-                aria-controls={`trainer-tabpanel-${language}-${tab.value}`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </nav>
-      ) : null}
-
-      <div className="max-w-2xl">
-        <p className="text-sm leading-7 text-zinc-600">{activeTabDetails.description}</p>
-      </div>
-
+    <div className="flex w-full flex-col">
       <div
         role="tabpanel"
         id={`trainer-tabpanel-${language}-${activeTab}`}

@@ -39,6 +39,35 @@ export const russianLetters: ScriptLetter[] = [
   { symbol: 'Я', sounds: ['Ya'] },
 ];
 
+export const ethiopianLetters: ScriptLetter[] = [
+  { symbol: 'ሀ', sounds: ['Ha'] },
+  { symbol: 'ለ', sounds: ['La'] },
+  { symbol: 'መ', sounds: ['Ma'] },
+  { symbol: 'ረ', sounds: ['Ra'] },
+  { symbol: 'ሰ', sounds: ['Sa'] },
+  { symbol: 'ሸ', sounds: ['Sha'] },
+  { symbol: 'ቀ', sounds: ['Qa'] },
+  { symbol: 'በ', sounds: ['Ba'] },
+  { symbol: 'ተ', sounds: ['Ta'] },
+  { symbol: 'ቸ', sounds: ['Cha'] },
+  { symbol: 'ነ', sounds: ['Na'] },
+  { symbol: 'ኘ', sounds: ['Nya'] },
+  { symbol: 'አ', sounds: ['A'] },
+  { symbol: 'ከ', sounds: ['Ka'] },
+  { symbol: 'ወ', sounds: ['Wa'] },
+  { symbol: 'ዘ', sounds: ['Za'] },
+  { symbol: 'ዠ', sounds: ['Zha'] },
+  { symbol: 'የ', sounds: ['Ya'] },
+  { symbol: 'ደ', sounds: ['Da'] },
+  { symbol: 'ጀ', sounds: ['Ja'] },
+  { symbol: 'ገ', sounds: ['Ga'] },
+  { symbol: 'ጠ', sounds: ['Tta'] },
+  { symbol: 'ጨ', sounds: ['Ccha'] },
+  { symbol: 'ጸ', sounds: ['Tsa'] },
+  { symbol: 'ፈ', sounds: ['Fa'] },
+  { symbol: 'ፐ', sounds: ['Pa'] },
+];
+
 export const greekLetters: ScriptLetter[] = [
   { symbol: 'Α', sounds: ['A'] },
   { symbol: 'Β', sounds: ['V'] },
@@ -64,6 +93,33 @@ export const greekLetters: ScriptLetter[] = [
   { symbol: 'Χ', sounds: ['Kh / h'] },
   { symbol: 'Ψ', sounds: ['Ps'] },
   { symbol: 'Ω', sounds: ['O (omega)'] },
+];
+
+export const myanmarLetters: ScriptLetter[] = [
+  { symbol: 'က', sounds: ['Ka'] },
+  { symbol: 'ခ', sounds: ['Kha'] },
+  { symbol: 'ဂ', sounds: ['Ga'] },
+  { symbol: 'င', sounds: ['Nga'] },
+  { symbol: 'စ', sounds: ['Sa'] },
+  { symbol: 'ဆ', sounds: ['Hsa'] },
+  { symbol: 'ဇ', sounds: ['Za'] },
+  { symbol: 'ည', sounds: ['Nya'] },
+  { symbol: 'တ', sounds: ['Ta'] },
+  { symbol: 'ထ', sounds: ['Hta'] },
+  { symbol: 'ဒ', sounds: ['Da'] },
+  { symbol: 'န', sounds: ['Na'] },
+  { symbol: 'ပ', sounds: ['Pa'] },
+  { symbol: 'ဖ', sounds: ['Pha'] },
+  { symbol: 'ဗ', sounds: ['Ba'] },
+  { symbol: 'ဘ', sounds: ['Bha'] },
+  { symbol: 'မ', sounds: ['Ma'] },
+  { symbol: 'ယ', sounds: ['Ya'] },
+  { symbol: 'ရ', sounds: ['Ra'] },
+  { symbol: 'လ', sounds: ['La'] },
+  { symbol: 'ဝ', sounds: ['Wa'] },
+  { symbol: 'သ', sounds: ['Tha'] },
+  { symbol: 'ဟ', sounds: ['Ha'] },
+  { symbol: 'အ', sounds: ['A'] },
 ];
 
 export const arabicLetters: ScriptLetter[] = [
