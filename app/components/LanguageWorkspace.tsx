@@ -3,8 +3,11 @@
 import { type ReactNode, useEffect, useState } from 'react';
 
 import TrainerTabs, { tabsByLanguage, type StudyLanguage, type TabValue } from './TrainerTabs';
-import HebrewKeyboardLayout from './HebrewKeyboardLayout';
-import KoreanKeyboardLayout from './KoreanKeyboardLayout';
+import {
+  BackspaceKeyIcon,
+  ShiftKeyIcon,
+  SpaceKeyIcon,
+} from './VirtualKeyboardKeyIcons';
 import {
   VirtualKeyboardContext,
   VIRTUAL_BACKSPACE_KEY,
@@ -20,12 +23,37 @@ const usHomeLegendRow = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'"];
 const usBottomLegendRow = ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'];
 const usNumberLegendRow = ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='];
 const defaultNumberRow: Keycap[] = usNumberLegendRow.map(key => ({ main: '', sub: key }));
+const shiftedKeyMap: Record<string, string> = {
+  '`': '~',
+  '1': '!',
+  '2': '@',
+  '3': '#',
+  '4': '$',
+  '5': '%',
+  '6': '^',
+  '7': '&',
+  '8': '*',
+  '9': '(',
+  '0': ')',
+  '-': '_',
+  '=': '+',
+  '[': '{',
+  ']': '}',
+  '\\': '|',
+  ';': ':',
+  "'": '"',
+  ',': '<',
+  '.': '>',
+  '/': '?',
+};
 
 const defaultLetterLegendRows = [usTopLegendRow, usHomeLegendRow, usBottomLegendRow];
 const defaultLetterLegendRowsFlat = defaultLetterLegendRows.flat();
 
 const readMainValue = (keycap?: Keycap) => (typeof keycap === 'string' ? keycap : (keycap?.main ?? ''));
 const readSubValue = (keycap?: Keycap) => (typeof keycap === 'string' ? null : (keycap?.sub ?? null));
+const getShiftedKeyValue = (key: string) =>
+  /^[a-z]$/.test(key) ? key.toUpperCase() : (shiftedKeyMap[key] ?? key);
 
 const buildReferenceRows = (rows: Keycap[][]) => {
   const resolvedRows: ResolvedKeycap[][] = defaultLetterLegendRows.map(legendRow =>
@@ -275,6 +303,86 @@ const katakanaKeyboardRows: Keycap[][] = [
   ['ツ', 'サ', 'ソ', 'ヒ', 'コ', 'ミ', 'モ'],
 ];
 
+const koreanKeyboardRows: Keycap[][] = [
+  [
+    { main: 'ㅂ', sub: 'q' },
+    { main: 'ㅈ', sub: 'w' },
+    { main: 'ㄷ', sub: 'e' },
+    { main: 'ㄱ', sub: 'r' },
+    { main: 'ㅅ', sub: 't' },
+    { main: 'ㅛ', sub: 'y' },
+    { main: 'ㅕ', sub: 'u' },
+    { main: 'ㅑ', sub: 'i' },
+    { main: 'ㅐ', sub: 'o' },
+    { main: 'ㅔ', sub: 'p' },
+  ],
+  [
+    { main: 'ㅁ', sub: 'a' },
+    { main: 'ㄴ', sub: 's' },
+    { main: 'ㅇ', sub: 'd' },
+    { main: 'ㄹ', sub: 'f' },
+    { main: 'ㅎ', sub: 'g' },
+    { main: 'ㅗ', sub: 'h' },
+    { main: 'ㅓ', sub: 'j' },
+    { main: 'ㅏ', sub: 'k' },
+    { main: 'ㅣ', sub: 'l' },
+    { main: '', sub: ';' },
+    { main: '', sub: "'" },
+  ],
+  [
+    { main: 'ㅋ', sub: 'z' },
+    { main: 'ㅌ', sub: 'x' },
+    { main: 'ㅊ', sub: 'c' },
+    { main: 'ㅍ', sub: 'v' },
+    { main: 'ㅠ', sub: 'b' },
+    { main: 'ㅜ', sub: 'n' },
+    { main: 'ㅡ', sub: 'm' },
+    { main: '', sub: ',' },
+    { main: '', sub: '.' },
+    { main: '', sub: '/' },
+  ],
+];
+
+const hebrewKeyboardRows: Keycap[][] = [
+  [
+    { main: '', sub: 'q' },
+    { main: '', sub: 'w' },
+    { main: 'ק', sub: 'e' },
+    { main: 'ר', sub: 'r' },
+    { main: 'א', sub: 't' },
+    { main: 'ט', sub: 'y' },
+    { main: 'ו', sub: 'u' },
+    { main: 'ן', sub: 'i' },
+    { main: 'ם', sub: 'o' },
+    { main: 'פ', sub: 'p' },
+  ],
+  [
+    { main: 'ש', sub: 'a' },
+    { main: 'ד', sub: 's' },
+    { main: 'ג', sub: 'd' },
+    { main: 'כ', sub: 'f' },
+    { main: 'ע', sub: 'g' },
+    { main: 'י', sub: 'h' },
+    { main: 'ח', sub: 'j' },
+    { main: 'ל', sub: 'k' },
+    { main: 'ך', sub: 'l' },
+    { main: 'ף', sub: ';' },
+    { main: '', sub: "'" },
+  ],
+  [
+    { main: 'ז', sub: 'z' },
+    { main: 'ס', sub: 'x' },
+    { main: 'ב', sub: 'c' },
+    { main: 'ה', sub: 'v' },
+    { main: 'נ', sub: 'b' },
+    { main: 'מ', sub: 'n' },
+    { main: 'צ', sub: 'm' },
+    { main: 'ת', sub: ',' },
+    { main: 'ץ', sub: '.' },
+    { main: '', sub: '/' },
+  ],
+];
+
 const cherokeeKeyboardRows: Keycap[][] = [
   [
     'Ꭺ',
@@ -517,7 +625,9 @@ const languageOptions: {
     value: 'korean',
     label: 'Korean',
     flag: '🇰🇷',
-    referenceContent: <KoreanKeyboardLayout />,
+    referenceContent: (
+      <KeyboardReferenceCard direction="ltr" lang="ko" rows={koreanKeyboardRows} />
+    ),
   },
   {
     value: 'russian',
@@ -677,7 +787,9 @@ const languageOptions: {
     value: 'hebrew',
     label: 'Hebrew',
     flag: '🇮🇱',
-    referenceContent: <HebrewKeyboardLayout />,
+    referenceContent: (
+      <KeyboardReferenceCard direction="ltr" lang="he" rows={hebrewKeyboardRows} />
+    ),
   },
   {
     value: 'georgian',
@@ -999,10 +1111,30 @@ function KeyboardReferenceCard({
 }) {
   const onVirtualKeyPress = useVirtualKeyboard();
   const bottomRowKeys = ['Shift', 'Space', 'Backspace'];
+  const [isShiftActive, setIsShiftActive] = useState(false);
   const mainKeyBaseClassName =
     'absolute right-1 top-1 text-right transition-colors group-hover:text-white sm:right-1.5 sm:top-1.5';
   const visibleNumberRow = numberRow ?? defaultNumberRow;
   const visibleLetterRows = buildReferenceRows(rows);
+  const getEffectiveMain = (main: string) =>
+    main && isShiftActive ? main.toLocaleUpperCase(lang) : main;
+  const getEffectiveSub = (main: string, sub: string) =>
+    main ? sub : (isShiftActive ? getShiftedKeyValue(sub) : sub);
+  const getUtilityKeyIcon = (key: string) => {
+    if (key === 'Shift') {
+      return <ShiftKeyIcon />;
+    }
+
+    if (key === 'Backspace') {
+      return <BackspaceKeyIcon />;
+    }
+
+    return <SpaceKeyIcon />;
+  };
+
+  useEffect(() => {
+    setIsShiftActive(false);
+  }, [lang]);
 
   return (
     <div className="px-1.5 py-2.5 sm:p-6" dir="ltr" lang={lang}>
@@ -1014,11 +1146,13 @@ function KeyboardReferenceCard({
               typeof keycap === 'string'
                 ? usNumberLegendRow[keyIndex] ?? ''
                 : (keycap.sub ?? usNumberLegendRow[keyIndex] ?? '');
-            const insertValue = main || sub;
+            const effectiveMain = getEffectiveMain(main);
+            const effectiveSub = getEffectiveSub(main, sub);
+            const insertValue = effectiveMain || effectiveSub;
             const mainKeyClassName =
-              main.length > 4
+              effectiveMain.length > 4
                 ? `${mainKeyBaseClassName} text-[0.48rem] font-semibold leading-tight sm:text-[0.72rem]`
-                : main.length > 2
+                : effectiveMain.length > 2
                   ? `${mainKeyBaseClassName} text-[0.62rem] font-medium leading-none sm:text-base`
                   : `${mainKeyBaseClassName} text-[0.95rem] font-medium leading-none sm:text-xl`;
 
@@ -1030,19 +1164,20 @@ function KeyboardReferenceCard({
                 onClick={() => {
                   if (insertValue) {
                     onVirtualKeyPress?.(insertValue);
+                    setIsShiftActive(false);
                   }
                 }}
                 className="group relative flex h-8 min-w-[1.35rem] items-stretch overflow-hidden rounded-lg border border-[var(--border)] px-1 py-0.5 text-zinc-950 transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:h-12 sm:min-w-[3.2rem] sm:rounded-xl sm:px-2 sm:py-1"
                 aria-label={`${lang} key ${insertValue}`}
               >
-                {main ? (
+                {effectiveMain ? (
                   <span className={mainKeyClassName}>
-                    {main}
+                    {effectiveMain}
                   </span>
                 ) : null}
                 {sub ? (
                   <span className="absolute bottom-0.5 left-1 text-[0.42rem] leading-none text-zinc-500 transition-colors group-hover:text-white sm:bottom-1 sm:left-1.5 sm:text-[0.62rem]">
-                    {sub}
+                    {effectiveSub}
                   </span>
                 ) : null}
               </button>
@@ -1056,12 +1191,14 @@ function KeyboardReferenceCard({
             className="flex flex-wrap justify-center gap-1 sm:gap-1.5"
           >
             {visibleRow.map(({ main, sub }, keyIndex) => {
-              const hasMain = main.length > 0;
-              const insertValue = main || sub;
+              const effectiveMain = getEffectiveMain(main);
+              const hasMain = effectiveMain.length > 0;
+              const effectiveSub = getEffectiveSub(main, sub);
+              const insertValue = effectiveMain || effectiveSub;
               const mainKeyClassName =
-                main.length > 4
+                effectiveMain.length > 4
                   ? `${mainKeyBaseClassName} text-[0.48rem] font-semibold leading-tight sm:text-[0.72rem]`
-                  : main.length > 2
+                  : effectiveMain.length > 2
                     ? `${mainKeyBaseClassName} text-[0.62rem] font-medium leading-none sm:text-base`
                     : `${mainKeyBaseClassName} text-[0.95rem] font-medium leading-none sm:text-xl`;
 
@@ -1073,6 +1210,7 @@ function KeyboardReferenceCard({
                   onClick={() => {
                     if (insertValue) {
                       onVirtualKeyPress?.(insertValue);
+                      setIsShiftActive(false);
                     }
                   }}
                   className="group relative flex h-8 min-w-[1.35rem] items-stretch overflow-hidden rounded-lg border border-[var(--border)] px-1 py-0.5 text-zinc-950 transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:h-12 sm:min-w-[3.2rem] sm:rounded-xl sm:px-2 sm:py-1"
@@ -1080,12 +1218,12 @@ function KeyboardReferenceCard({
                 >
                   {hasMain ? (
                     <span className={mainKeyClassName}>
-                      {main}
+                      {effectiveMain}
                     </span>
                   ) : null}
                   {sub ? (
                     <span className="absolute bottom-0.5 left-1 text-[0.42rem] leading-none text-zinc-500 transition-colors group-hover:text-white sm:bottom-1 sm:left-1.5 sm:text-[0.62rem]">
-                      {sub}
+                      {effectiveSub}
                     </span>
                   ) : null}
                 </button>
@@ -1101,8 +1239,14 @@ function KeyboardReferenceCard({
               type="button"
               onMouseDown={event => event.preventDefault()}
               onClick={() => {
+                if (key === 'Shift') {
+                  setIsShiftActive(current => !current);
+                  return;
+                }
+
                 if (key === 'Space') {
                   onVirtualKeyPress?.(' ');
+                  setIsShiftActive(false);
                   return;
                 }
 
@@ -1110,14 +1254,18 @@ function KeyboardReferenceCard({
                   onVirtualKeyPress?.(VIRTUAL_BACKSPACE_KEY);
                 }
               }}
-              className={`flex h-7 items-center justify-center rounded-lg border border-[var(--border)] text-[0.46rem] uppercase tracking-[0.16em] text-zinc-500 sm:h-10 sm:rounded-xl sm:text-[0.65rem] sm:tracking-[0.18em] ${
+              className={`flex h-7 items-center justify-center rounded-lg border text-[0.46rem] uppercase tracking-[0.16em] transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:h-10 sm:rounded-xl sm:text-[0.65rem] sm:tracking-[0.18em] ${
+                key === 'Shift' && isShiftActive
+                  ? 'border-zinc-950 bg-zinc-950 text-white'
+                  : 'border-[var(--border)] text-zinc-500'
+              } ${
                 key === 'Space'
                   ? 'min-w-[6rem] px-3 sm:min-w-[14rem] sm:px-4'
                   : 'w-12 sm:w-20'
               }`}
               aria-label={key}
             >
-              {key}
+              {getUtilityKeyIcon(key)}
             </button>
           ))}
         </div>
@@ -1159,8 +1307,8 @@ export default function LanguageWorkspace() {
 
   return (
     <VirtualKeyboardContext.Provider value={virtualKeyHandler}>
-      <div className="flex flex-col gap-8 lg:gap-10">
-      <header className="flex flex-col gap-4 pb-4">
+      <div className="flex flex-col gap-5 lg:gap-6">
+      <header className="flex flex-col gap-3 pb-2">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <BrandMark />
 
@@ -1194,7 +1342,7 @@ export default function LanguageWorkspace() {
           aria-labelledby={`language-tab-${activeLanguage}`}
           className="min-w-0"
         >
-          <section className="flex flex-col gap-5 sm:gap-6">
+          <section className="flex flex-col gap-3 sm:gap-4">
             <TrainerTabs
               language={activeLanguage}
               activeTab={activeTab}
@@ -1203,7 +1351,7 @@ export default function LanguageWorkspace() {
             />
 
             {activeTab === 'typing' && activeOption.referenceContent ? (
-              <section className="pt-1 sm:pt-2">
+              <section>
                 {activeOption.referenceContent}
               </section>
             ) : null}

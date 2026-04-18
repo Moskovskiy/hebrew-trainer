@@ -400,7 +400,7 @@ export default function TypingTrainer({
 
   const getCharClass = (char: string, idx: number) => {
     if (idx < inputUnits.length) {
-      return inputUnits[idx] === char ? 'text-zinc-950' : 'text-zinc-400 underline';
+      return inputUnits[idx] === char ? 'text-zinc-950' : 'text-red-600';
     }
 
     if (idx === inputUnits.length) {
@@ -411,9 +411,9 @@ export default function TypingTrainer({
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       <section className="p-4 sm:p-6">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           <div
             dir={languageConfig.direction}
             lang={languageConfig.htmlLang}
@@ -423,7 +423,7 @@ export default function TypingTrainer({
           >
             <div
               className={`flex items-start gap-3 ${
-                languageConfig.direction === 'rtl' ? 'flex-row' : 'flex-row-reverse'
+                languageConfig.direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'
               }`}
             >
               <button
@@ -458,7 +458,7 @@ export default function TypingTrainer({
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck={false}
-              className={`min-h-[160px] w-full rounded-2xl bg-zinc-100 px-4 py-3.5 text-xl text-zinc-950 outline-none transition focus:bg-zinc-200 sm:py-4 ${
+              className={`min-h-[80px] w-full rounded-2xl bg-zinc-100 px-4 py-3.5 text-xl text-zinc-950 outline-none transition focus:bg-zinc-200 sm:py-4 ${
                 languageConfig.direction === 'rtl' ? 'text-right' : 'text-left'
               }`}
               aria-label={`Type the ${languageConfig.label} prompt`}
