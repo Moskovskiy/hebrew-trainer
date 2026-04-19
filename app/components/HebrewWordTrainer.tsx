@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { hebrewCommonWords } from '../data/hebrewWords';
 
@@ -65,11 +65,6 @@ export default function HebrewWordTrainer({
   const accuracy = totalAnswers > 0 ? Math.round((score.correct / totalAnswers) * 100) : null;
 
   useEffect(() => {
-    setOptions(buildOptionSet(currentIndex));
-    setSelectedOption(null);
-  }, [currentIndex]);
-
-  useEffect(() => {
     onStatsChange?.([
       { label: 'Correct', value: score.correct },
       { label: 'Incorrect', value: score.incorrect },
@@ -77,17 +72,23 @@ export default function HebrewWordTrainer({
     ]);
   }, [accuracy, onStatsChange, score.correct, score.incorrect]);
 
+  const moveToIndex = useCallback((nextIndex: number) => {
+    setCurrentIndex(nextIndex);
+    setOptions(buildOptionSet(nextIndex));
+    setSelectedOption(null);
+  }, []);
+
   useEffect(() => {
     if (!selectedOption) {
       return;
     }
 
     const timeout = window.setTimeout(() => {
-      setCurrentIndex(previous => pickRandomIndex(hebrewCommonWords.length, previous));
+      moveToIndex(pickRandomIndex(hebrewCommonWords.length, currentIndex));
     }, 900);
 
     return () => window.clearTimeout(timeout);
-  }, [selectedOption]);
+  }, [currentIndex, moveToIndex, selectedOption]);
 
   const handleOptionClick = (option: string) => {
     if (selectedOption) {
@@ -104,7 +105,7 @@ export default function HebrewWordTrainer({
   };
 
   const goToNextWord = () => {
-    setCurrentIndex(previous => pickRandomIndex(hebrewCommonWords.length, previous));
+    moveToIndex(pickRandomIndex(hebrewCommonWords.length, currentIndex));
   };
 
   const getOptionClassName = (option: string) => {

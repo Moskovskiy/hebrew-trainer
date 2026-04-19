@@ -15,7 +15,6 @@ export default function HebrewLetterTrainer({
     <SoundTrainer
       entries={hebrewSoundEntries}
       promptLabel="Hebrew letter"
-      instructionText="Choose the sound that matches the letter. The next card appears automatically."
       onStatsChange={onStatsChange}
     />
   );

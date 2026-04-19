@@ -420,6 +420,7 @@ export default function TrainerTabs({
     if (value === 'typing') {
       return (
         <TypingTrainer
+          key={language}
           language={language}
           onStatsChange={onStatsChange}
           onVirtualKeyHandlerChange={onVirtualKeyHandlerChange}
@@ -428,15 +429,15 @@ export default function TrainerTabs({
     }
 
     if (value === 'words' && language === 'hebrew') {
-      return <HebrewWordTrainer onStatsChange={onStatsChange} />;
+      return <HebrewWordTrainer key="hebrew-words" onStatsChange={onStatsChange} />;
     }
 
     if (language === 'hebrew') {
-      return <HebrewLetterTrainer onStatsChange={onStatsChange} />;
+      return <HebrewLetterTrainer key="hebrew-letters" onStatsChange={onStatsChange} />;
     }
 
     if (language === 'korean') {
-      return <KoreanLetterTrainer onStatsChange={onStatsChange} />;
+      return <KoreanLetterTrainer key="korean-letters" onStatsChange={onStatsChange} />;
     }
 
     const letterPracticeByLanguage = {
@@ -603,9 +604,9 @@ export default function TrainerTabs({
 
     return (
       <SoundTrainer
+        key={language}
         entries={practiceConfig.entries}
         promptLabel={practiceConfig.promptLabel}
-        instructionText={practiceConfig.instructionText}
         onStatsChange={onStatsChange}
       />
     );

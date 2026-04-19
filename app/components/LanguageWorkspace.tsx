@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useState } from 'react';
 
 import TrainerTabs, { tabsByLanguage, type StudyLanguage, type TabValue } from './TrainerTabs';
 import {
@@ -1099,7 +1099,7 @@ function DesktopStatsRail({ stats }: { stats: SidebarStat[] }) {
 }
 
 function KeyboardReferenceCard({
-  direction: _direction,
+  direction,
   lang,
   numberRow,
   rows,
@@ -1113,7 +1113,7 @@ function KeyboardReferenceCard({
   const bottomRowKeys = ['Shift', 'Space', 'Backspace'];
   const [isShiftActive, setIsShiftActive] = useState(false);
   const mainKeyBaseClassName =
-    'absolute right-1 top-1 text-right transition-colors group-hover:text-white sm:right-1.5 sm:top-1.5';
+    'absolute right-0.5 top-0.5 text-right transition-colors group-hover:text-white sm:right-1.5 sm:top-1.5';
   const visibleNumberRow = numberRow ?? defaultNumberRow;
   const visibleLetterRows = buildReferenceRows(rows);
   const getEffectiveMain = (main: string) =>
@@ -1132,14 +1132,10 @@ function KeyboardReferenceCard({
     return <SpaceKeyIcon />;
   };
 
-  useEffect(() => {
-    setIsShiftActive(false);
-  }, [lang]);
-
   return (
-    <div className="px-0 py-2.5 sm:p-6" dir="ltr" lang={lang}>
-      <div className="space-y-1.5 sm:space-y-3">
-        <div className="flex flex-wrap justify-center gap-1 sm:gap-1.5">
+    <div className="px-0 py-1 sm:p-5" dir="ltr" lang={lang} data-direction={direction}>
+      <div className="space-y-1 sm:space-y-2.5">
+        <div className="flex flex-wrap justify-center gap-0.5 sm:gap-1.5">
           {visibleNumberRow.map((keycap, keyIndex) => {
             const main = typeof keycap === 'string' ? keycap : (keycap.main ?? '');
             const sub =
@@ -1151,10 +1147,10 @@ function KeyboardReferenceCard({
             const insertValue = effectiveMain || effectiveSub;
             const mainKeyClassName =
               effectiveMain.length > 4
-                ? `${mainKeyBaseClassName} text-[0.48rem] font-semibold leading-tight sm:text-[0.72rem]`
+                ? `${mainKeyBaseClassName} text-[0.38rem] font-semibold leading-tight sm:text-[0.72rem]`
                 : effectiveMain.length > 2
-                  ? `${mainKeyBaseClassName} text-[0.62rem] font-medium leading-none sm:text-base`
-                  : `${mainKeyBaseClassName} text-[0.95rem] font-medium leading-none sm:text-xl`;
+                  ? `${mainKeyBaseClassName} text-[0.5rem] font-medium leading-none sm:text-base`
+                  : `${mainKeyBaseClassName} text-[0.78rem] font-medium leading-none sm:text-xl`;
 
             return (
               <button
@@ -1167,7 +1163,7 @@ function KeyboardReferenceCard({
                     setIsShiftActive(false);
                   }
                 }}
-                className="group relative flex h-8 min-w-[1.35rem] items-stretch overflow-hidden rounded-lg border border-[var(--border)] px-1 py-0.5 text-zinc-950 transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:h-12 sm:min-w-[3.2rem] sm:rounded-xl sm:px-2 sm:py-1"
+                className="group relative flex h-7 min-w-[1.2rem] items-stretch overflow-hidden rounded-lg border border-[var(--border)] px-0.5 py-0.5 text-zinc-950 transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:h-12 sm:min-w-[3.2rem] sm:rounded-xl sm:px-2 sm:py-1"
                 aria-label={`${lang} key ${insertValue}`}
               >
                 {effectiveMain ? (
@@ -1176,7 +1172,7 @@ function KeyboardReferenceCard({
                   </span>
                 ) : null}
                 {sub ? (
-                  <span className="absolute bottom-0.5 left-1 text-[0.42rem] leading-none text-zinc-500 transition-colors group-hover:text-white sm:bottom-1 sm:left-1.5 sm:text-[0.62rem]">
+                  <span className="absolute bottom-0.5 left-0.5 text-[0.34rem] leading-none text-zinc-500 transition-colors group-hover:text-white sm:bottom-1 sm:left-1.5 sm:text-[0.62rem]">
                     {effectiveSub}
                   </span>
                 ) : null}
@@ -1188,7 +1184,7 @@ function KeyboardReferenceCard({
         {visibleLetterRows.map((visibleRow, rowIndex) => (
           <div
             key={`${lang}-${rowIndex}`}
-            className="flex flex-wrap justify-center gap-1 sm:gap-1.5"
+            className="flex flex-wrap justify-center gap-0.5 sm:gap-1.5"
           >
             {visibleRow.map(({ main, sub }, keyIndex) => {
               const effectiveMain = getEffectiveMain(main);
@@ -1197,10 +1193,10 @@ function KeyboardReferenceCard({
               const insertValue = effectiveMain || effectiveSub;
               const mainKeyClassName =
                 effectiveMain.length > 4
-                  ? `${mainKeyBaseClassName} text-[0.48rem] font-semibold leading-tight sm:text-[0.72rem]`
+                  ? `${mainKeyBaseClassName} text-[0.38rem] font-semibold leading-tight sm:text-[0.72rem]`
                   : effectiveMain.length > 2
-                    ? `${mainKeyBaseClassName} text-[0.62rem] font-medium leading-none sm:text-base`
-                    : `${mainKeyBaseClassName} text-[0.95rem] font-medium leading-none sm:text-xl`;
+                    ? `${mainKeyBaseClassName} text-[0.5rem] font-medium leading-none sm:text-base`
+                    : `${mainKeyBaseClassName} text-[0.78rem] font-medium leading-none sm:text-xl`;
 
               return (
                 <button
@@ -1213,7 +1209,7 @@ function KeyboardReferenceCard({
                       setIsShiftActive(false);
                     }
                   }}
-                  className="group relative flex h-8 min-w-[1.35rem] items-stretch overflow-hidden rounded-lg border border-[var(--border)] px-1 py-0.5 text-zinc-950 transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:h-12 sm:min-w-[3.2rem] sm:rounded-xl sm:px-2 sm:py-1"
+                  className="group relative flex h-7 min-w-[1.2rem] items-stretch overflow-hidden rounded-lg border border-[var(--border)] px-0.5 py-0.5 text-zinc-950 transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:h-12 sm:min-w-[3.2rem] sm:rounded-xl sm:px-2 sm:py-1"
                   aria-label={`${lang} key ${insertValue}`}
                 >
                   {hasMain ? (
@@ -1222,7 +1218,7 @@ function KeyboardReferenceCard({
                     </span>
                   ) : null}
                   {sub ? (
-                    <span className="absolute bottom-0.5 left-1 text-[0.42rem] leading-none text-zinc-500 transition-colors group-hover:text-white sm:bottom-1 sm:left-1.5 sm:text-[0.62rem]">
+                    <span className="absolute bottom-0.5 left-0.5 text-[0.34rem] leading-none text-zinc-500 transition-colors group-hover:text-white sm:bottom-1 sm:left-1.5 sm:text-[0.62rem]">
                       {effectiveSub}
                     </span>
                   ) : null}
@@ -1232,7 +1228,7 @@ function KeyboardReferenceCard({
           </div>
         ))}
 
-        <div className="flex flex-wrap items-center justify-center gap-1 pt-1 sm:gap-1.5 sm:pt-1.5">
+        <div className="flex flex-wrap items-center justify-center gap-0.5 pt-0.5 sm:gap-1.5 sm:pt-1.5">
           {bottomRowKeys.map(key => (
             <button
               key={key}
@@ -1254,14 +1250,14 @@ function KeyboardReferenceCard({
                   onVirtualKeyPress?.(VIRTUAL_BACKSPACE_KEY);
                 }
               }}
-              className={`flex h-7 items-center justify-center rounded-lg border text-[0.46rem] uppercase tracking-[0.16em] transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:h-10 sm:rounded-xl sm:text-[0.65rem] sm:tracking-[0.18em] ${
+              className={`flex h-6 items-center justify-center rounded-lg border text-[0.42rem] uppercase tracking-[0.14em] transition-colors hover:bg-zinc-950 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:h-10 sm:rounded-xl sm:text-[0.65rem] sm:tracking-[0.18em] ${
                 key === 'Shift' && isShiftActive
                   ? 'border-zinc-950 bg-zinc-950 text-white'
                   : 'border-[var(--border)] text-zinc-500'
               } ${
                 key === 'Space'
-                  ? 'min-w-[6rem] px-3 sm:min-w-[14rem] sm:px-4'
-                  : 'w-12 sm:w-20'
+                  ? 'min-w-[5rem] px-2 sm:min-w-[14rem] sm:px-4'
+                  : 'w-10 sm:w-20'
               }`}
               aria-label={key}
             >
@@ -1282,10 +1278,18 @@ export default function LanguageWorkspace() {
   const activeOption =
     languageOptions.find(option => option.value === activeLanguage) ?? languageOptions[0];
   const activeTabs = tabsByLanguage[activeLanguage];
+  const currentTab =
+    activeTabs.find(tab => tab.value === activeTab)?.value ?? activeTabs[0].value;
 
   const handleLanguageChange = (language: StudyLanguage) => {
     setActiveLanguage(language);
     setActiveTab('typing');
+    setDesktopStats(getDefaultStats('typing'));
+  };
+
+  const handleTabChange = (tab: TabValue) => {
+    setActiveTab(tab);
+    setDesktopStats(getDefaultStats(tab));
   };
 
   const handleVirtualKeyHandlerChange = (
@@ -1294,16 +1298,6 @@ export default function LanguageWorkspace() {
     // Store function values directly instead of letting React treat them as updater callbacks.
     setVirtualKeyHandler(() => handler);
   };
-
-  useEffect(() => {
-    if (!activeTabs.some(tab => tab.value === activeTab)) {
-      setActiveTab(activeTabs[0].value);
-    }
-  }, [activeTab, activeTabs]);
-
-  useEffect(() => {
-    setDesktopStats(getDefaultStats(activeTab));
-  }, [activeLanguage, activeTab]);
 
   return (
     <VirtualKeyboardContext.Provider value={virtualKeyHandler}>
@@ -1314,9 +1308,9 @@ export default function LanguageWorkspace() {
 
           <PracticeModeSwitch
             activeLanguage={activeLanguage}
-            activeTab={activeTab}
+            activeTab={currentTab}
             activeTabs={activeTabs}
-            onTabChange={setActiveTab}
+            onTabChange={handleTabChange}
           />
         </div>
 
@@ -1342,16 +1336,19 @@ export default function LanguageWorkspace() {
           aria-labelledby={`language-tab-${activeLanguage}`}
           className="min-w-0"
         >
-          <section className="flex flex-col gap-3 sm:gap-4">
+          <section className="flex flex-col gap-2 sm:gap-3">
             <TrainerTabs
               language={activeLanguage}
-              activeTab={activeTab}
+              activeTab={currentTab}
               onStatsChange={setDesktopStats}
               onVirtualKeyHandlerChange={handleVirtualKeyHandlerChange}
             />
 
-            {activeTab === 'typing' && activeOption.referenceContent ? (
-              <section className="-mx-4 lg:mx-0 lg:rounded-[2rem] lg:border lg:border-[var(--border)]">
+            {currentTab === 'typing' && activeOption.referenceContent ? (
+              <section
+                key={activeLanguage}
+                className="-mx-4 lg:mx-0 lg:rounded-[2rem] lg:border lg:border-l-0 lg:border-[var(--border)]"
+              >
                 {activeOption.referenceContent}
               </section>
             ) : null}

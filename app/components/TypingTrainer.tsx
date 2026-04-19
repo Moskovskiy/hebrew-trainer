@@ -1,5 +1,5 @@
 'use client';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 import { cherokeePracticePrompts } from '../data/cherokee';
 import { copticPracticePrompts } from '../data/coptic';
@@ -281,7 +281,7 @@ export default function TypingTrainer({
 }) {
   const languageConfig = typingLanguageConfig[language];
   const inputRef = useRef<HTMLInputElement>(null);
-  const [promptKey, setPromptKey] = useState(0);
+  const nextPromptTimeoutRef = useRef<number | null>(null);
   const [prompt, setPrompt] = useState(() => createPrompt(language));
   const [input, setInput] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -292,24 +292,28 @@ export default function TypingTrainer({
   const promptUnits = segmentText(prompt);
   const inputUnits = segmentText(input);
 
-  useEffect(() => {
+  const loadNextPrompt = useCallback(() => {
+    if (nextPromptTimeoutRef.current) {
+      window.clearTimeout(nextPromptTimeoutRef.current);
+      nextPromptTimeoutRef.current = null;
+    }
+
     setPrompt(createPrompt(language));
     setInput('');
     setStartTime(null);
     setMistakes(0);
-  }, [language, promptKey]);
-
-  useEffect(() => {
-    setCompletedPrompts(0);
-    setLastSpeed(null);
-    setLastAccuracy(null);
   }, [language]);
 
   useEffect(() => {
     window.requestAnimationFrame(() => {
       inputRef.current?.focus();
     });
-  }, [language]);
+    return () => {
+      if (nextPromptTimeoutRef.current) {
+        window.clearTimeout(nextPromptTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     onStatsChange?.([
@@ -321,88 +325,94 @@ export default function TypingTrainer({
   }, [completedPrompts, lastAccuracy, lastSpeed, mistakes, onStatsChange]);
 
   const moveToNextPrompt = () => {
-    setPromptKey(current => current + 1);
+    loadNextPrompt();
   };
 
-  const applyInputValue = (nextValue: string) => {
+  const applyInputValue = useCallback((nextValue: string) => {
     const nextUnits = segmentText(nextValue);
+    const currentInputUnits = segmentText(input);
+    const currentPromptUnits = segmentText(prompt);
+    let nextStartTime = startTime;
 
-    if (startTime === null && nextUnits.length > 0) {
-      setStartTime(Date.now());
+    if (nextStartTime === null && nextUnits.length > 0) {
+      nextStartTime = Date.now();
+      setStartTime(nextStartTime);
     }
 
-    if (nextUnits.length > inputUnits.length) {
+    let nextMistakeTotal = mistakes;
+
+    if (nextUnits.length > currentInputUnits.length) {
       let nextMistakes = 0;
 
-      for (let nextIndex = inputUnits.length; nextIndex < nextUnits.length; nextIndex += 1) {
-        if (nextIndex >= promptUnits.length || nextUnits[nextIndex] !== promptUnits[nextIndex]) {
+      for (let nextIndex = currentInputUnits.length; nextIndex < nextUnits.length; nextIndex += 1) {
+        if (nextIndex >= currentPromptUnits.length || nextUnits[nextIndex] !== currentPromptUnits[nextIndex]) {
           nextMistakes += 1;
         }
       }
 
       if (nextMistakes > 0) {
+        nextMistakeTotal += nextMistakes;
         setMistakes(current => current + nextMistakes);
       }
     }
 
     setInput(nextValue);
-  };
+
+    if (nextValue !== prompt || !nextStartTime) {
+      return;
+    }
+
+    const seconds = Math.max((Date.now() - nextStartTime) / 1000, 0.1);
+    const accuracy = Math.max(
+      ((currentPromptUnits.length - nextMistakeTotal) / currentPromptUnits.length) * 100,
+      0,
+    );
+
+    setLastSpeed(currentPromptUnits.length / seconds);
+    setLastAccuracy(accuracy);
+    setCompletedPrompts(current => current + 1);
+
+    nextPromptTimeoutRef.current = window.setTimeout(() => {
+      loadNextPrompt();
+    }, 650);
+  }, [input, loadNextPrompt, mistakes, prompt, startTime]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     applyInputValue(event.target.value);
   };
 
+  const handleVirtualKeyPress = useCallback((key: string | null | undefined) => {
+    if (!key) {
+      return;
+    }
+
+    const inputElement = inputRef.current;
+    const selectionStart = inputElement?.selectionStart ?? input.length;
+    const selectionEnd = inputElement?.selectionEnd ?? input.length;
+    const hasSelection = selectionStart !== selectionEnd;
+    const isBackspace = key === VIRTUAL_BACKSPACE_KEY;
+    const deleteStart =
+      isBackspace && !hasSelection ? Math.max(selectionStart - 1, 0) : selectionStart;
+    const nextValue = isBackspace
+      ? `${input.slice(0, deleteStart)}${input.slice(selectionEnd)}`
+      : `${input.slice(0, selectionStart)}${key}${input.slice(selectionEnd)}`;
+    const nextCursorPosition = isBackspace ? deleteStart : selectionStart + key.length;
+
+    applyInputValue(nextValue);
+
+    window.requestAnimationFrame(() => {
+      inputRef.current?.focus();
+      inputRef.current?.setSelectionRange(nextCursorPosition, nextCursorPosition);
+    });
+  }, [applyInputValue, input]);
+
   useEffect(() => {
-    const handleVirtualKeyPress = (key: string | null | undefined) => {
-      if (!key) {
-        return;
-      }
-
-      const inputElement = inputRef.current;
-      const selectionStart = inputElement?.selectionStart ?? input.length;
-      const selectionEnd = inputElement?.selectionEnd ?? input.length;
-      const hasSelection = selectionStart !== selectionEnd;
-      const isBackspace = key === VIRTUAL_BACKSPACE_KEY;
-      const deleteStart =
-        isBackspace && !hasSelection ? Math.max(selectionStart - 1, 0) : selectionStart;
-      const nextValue = isBackspace
-        ? `${input.slice(0, deleteStart)}${input.slice(selectionEnd)}`
-        : `${input.slice(0, selectionStart)}${key}${input.slice(selectionEnd)}`;
-      const nextCursorPosition = isBackspace ? deleteStart : selectionStart + key.length;
-
-      applyInputValue(nextValue);
-
-      window.requestAnimationFrame(() => {
-        inputRef.current?.focus();
-        inputRef.current?.setSelectionRange(nextCursorPosition, nextCursorPosition);
-      });
-    };
-
     onVirtualKeyHandlerChange?.(handleVirtualKeyPress);
 
     return () => {
       onVirtualKeyHandlerChange?.(null);
     };
-  }, [input, onVirtualKeyHandlerChange, startTime, inputUnits.length, promptUnits]);
-
-  useEffect(() => {
-    if (input !== prompt || !startTime) {
-      return;
-    }
-
-    const seconds = Math.max((Date.now() - startTime) / 1000, 0.1);
-    const accuracy = Math.max(((promptUnits.length - mistakes) / promptUnits.length) * 100, 0);
-
-    setLastSpeed(promptUnits.length / seconds);
-    setLastAccuracy(accuracy);
-    setCompletedPrompts(current => current + 1);
-
-    const timeout = window.setTimeout(() => {
-      setPromptKey(current => current + 1);
-    }, 650);
-
-    return () => window.clearTimeout(timeout);
-  }, [input, prompt, promptUnits.length, startTime, mistakes]);
+  }, [handleVirtualKeyPress, onVirtualKeyHandlerChange]);
 
   const getCharClass = (char: string, idx: number) => {
     if (idx < inputUnits.length) {
@@ -417,18 +427,18 @@ export default function TypingTrainer({
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <section className="p-4 sm:p-6">
-        <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2.5 sm:gap-3">
+      <section className="p-3 sm:p-5">
+        <div className="flex flex-col gap-2">
           <div
             dir={languageConfig.direction}
             lang={languageConfig.htmlLang}
-            className={`min-h-[6.5rem] px-5 py-5 text-[1.65rem] leading-loose tracking-[0.03em] text-zinc-950 sm:px-6 sm:py-6 sm:text-3xl ${
+            className={`min-h-[5.75rem] px-4 py-3.5 text-[1.65rem] leading-loose tracking-[0.03em] text-zinc-950 sm:px-5 sm:py-4 sm:text-3xl ${
               languageConfig.direction === 'rtl' ? 'text-right' : 'text-left'
             }`}
           >
             <div
-              className={`flex items-start gap-3 ${
+              className={`flex items-start gap-2.5 ${
                 languageConfig.direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'
               }`}
             >
@@ -464,7 +474,7 @@ export default function TypingTrainer({
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck={false}
-              className={`min-h-[80px] w-full rounded-2xl bg-zinc-100 px-4 py-3.5 text-xl text-zinc-950 outline-none transition focus:bg-zinc-200 sm:py-4 ${
+              className={`min-h-[72px] w-full rounded-2xl bg-zinc-100 px-4 py-3 text-xl text-zinc-950 outline-none transition focus:bg-zinc-200 sm:min-h-[76px] sm:py-3.5 ${
                 languageConfig.direction === 'rtl' ? 'text-right' : 'text-left'
               }`}
               aria-label={`Type the ${languageConfig.label} prompt`}
@@ -473,7 +483,7 @@ export default function TypingTrainer({
         </div>
       </section>
 
-      <aside className="border-t border-[var(--border)] p-4 lg:hidden">
+      <aside className="border-t border-[var(--border)] p-3 lg:hidden">
         <div className="space-y-4 text-sm">
           <div>
             <p className="text-zinc-500">Completed</p>
